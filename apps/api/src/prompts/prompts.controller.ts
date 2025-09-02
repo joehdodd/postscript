@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { PromptsService } from './prompts.service';
 
 @Controller('prompts')
@@ -9,5 +9,10 @@ export class PromptsController {
   async getDailyPrompt(): Promise<{ prompt: string }> {
     const prompt = await this.promptsService.generateDailyPrompt();
     return { prompt };
+  }
+
+  @Post()
+  async createPrompt(@Body() body: { content: string; frequency?: string; userId?: string }) {
+    return this.promptsService.createPrompt(body.content, body.frequency, body.userId);
   }
 }

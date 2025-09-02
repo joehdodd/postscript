@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
 
 @Injectable()
 export class PromptsService {
+  private prisma = new PrismaClient();
   constructor(private configService: ConfigService) {}
 
   async generateDailyPrompt(): Promise<string> {
@@ -21,5 +23,15 @@ export class PromptsService {
     });
 
     return response.choices[0].message?.content ?? 'Write about your day.';
+  }
+
+  async createPrompt(content: string, frequency?: string, userId?: string) {
+    return this.prisma.prompt.create({
+      data: {
+        content,
+        frequency: frequency ?? 'daily',
+        userId: userId ?? undefined,
+      },
+    });
   }
 }
