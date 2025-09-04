@@ -5,12 +5,13 @@ import { PromptsModule } from './prompts/prompts.module';
 
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: ['.env', '.env.local'],
-  }), PromptsModule],
+  }), PromptsModule, EmailModule],
   controllers: [AppController],
   providers: [AppService],
 })

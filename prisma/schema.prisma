@@ -14,6 +14,7 @@ model User {
   email     String   @unique
   frequency String   // e.g., 'daily', 'weekly'
   prompts   Prompt[]
+  entries   Entry[]
 }
 
 model Prompt {
@@ -24,4 +25,15 @@ model Prompt {
   frequency String   // e.g., 'daily', 'weekly'
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  entries   Entry[]
+}
+
+model Entry {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  userId    String
+  promptId  String
+  user      User     @relation(fields: [userId], references: [id])
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
 }
