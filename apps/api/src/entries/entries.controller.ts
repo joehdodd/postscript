@@ -8,9 +8,8 @@ export class EntriesController {
   ) {}
 
   @Post()
-  async createEntry(@Body() body: any) {
-    console.log('Received entry creation request:', body);
-    // return this.entriesService.createEntry(body.content, body.userId, body.promptId);
+  async createEntry(@Body() body: { content: string; userId: string; promptId: string }) {
+    return this.entriesService.createEntry(body.content, body.userId, body.promptId);
   }
 
   @Get('user/:userId')

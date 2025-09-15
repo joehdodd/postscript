@@ -25,12 +25,15 @@ export class PromptsService {
     return response.choices[0].message?.content ?? 'Write about your day.';
   }
 
-  async createPrompt(content: string, frequency?: string, userId?: string) {
+  async createPrompt(content: string, email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
     return this.prisma.prompt.create({
       data: {
         content,
-        frequency: frequency ?? 'daily',
-        userId: userId ?? undefined,
+        frequency: 'daily',
+        user: { connect: { id: user.id } },
       },
     });
   }

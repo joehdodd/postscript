@@ -12,7 +12,7 @@ export class PromptsController {
   }
 
   @Post()
-  async createPrompt(@Body() body: { content: string; frequency?: string; userId?: string }) {
-    return this.promptsService.createPrompt(body.content, body.frequency, body.userId);
+  async createPrompt(@Body() body: { content: string; userId: string }) {
+    return this.promptsService.createPrompt(body.content, body.userId);
   }
 }
