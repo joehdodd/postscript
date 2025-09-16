@@ -1,12 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
+
+const prisma = new PrismaClient();
 
 const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || 'supersecret';
 const MAGIC_LINK_EXPIRY = '15m'; // 15 minutes
 
 @Injectable()
 export class MagicLinkService {
-  generateToken(userId: string, promptId: string): string {
+  async generateToken(email: string, promptId: string): Promise<string> {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const userId = user.id;
     return jwt.sign({ userId, promptId }, MAGIC_LINK_SECRET, { expiresIn: MAGIC_LINK_EXPIRY });
   }
 

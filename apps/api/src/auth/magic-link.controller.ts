@@ -7,8 +7,8 @@ export class MagicLinkController {
 
   // Endpoint to generate a magic link token
   @Post()
-  generateMagicLink(@Body() body: { userId: string; promptId: string }) {
-    const token = this.magicLinkService.generateToken(body.userId, body.promptId);
+  async generateMagicLink(@Body() body: { email: string; promptId: string }) {
+    const token = await this.magicLinkService.generateToken(body.email, body.promptId);
     return { token };
   }
 

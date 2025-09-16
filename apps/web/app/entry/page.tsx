@@ -1,5 +1,6 @@
 import { Card } from '@repo/ui/card';
 import EntryForm from '../components/EntryForm';
+import Prompt from '../components/Prompt';
 import { requireAuth } from '../utils/auth-util';
 import { redirect } from 'next/navigation';
 
@@ -17,6 +18,7 @@ export default async function Entry({ searchParams }: EntryPageProps) {
       <h2 className="text-xl text-slate-600 dark:text-slate-200 font-bold">
         Add a new entry
       </h2>
+      <Prompt promptId={promptId} />
       <EntryForm userId={userId} promptId={promptId} />
     </Card>
   );
