@@ -1,14 +1,14 @@
 'use server';
 
-export async function auth(token: string) {
+export async function auth(token: string | string[]) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/auth?token=${token}`,
+    `${process.env.NEST_API_URL}/auth?token=${Array.isArray(token) ? token.join(',') : token}`,
     {
       cache: 'no-store',
     },
   );
   if (!res.ok) {
-    throw new Error('Failed to authenticate');
+    return { valid: false };
   }
   return res.json() as Promise<{ valid: boolean; userId?: string; promptId?: string }>;
 }

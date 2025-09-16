@@ -13,6 +13,7 @@ export class MagicLinkService {
   validateToken(token: string): { userId: string; promptId: string } | null {
     try {
       const payload = jwt.verify(token, MAGIC_LINK_SECRET) as { userId: string; promptId: string };
+      console.log('Token payload:', payload);
       return payload;
     } catch {
       return null;

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, HttpException } from '@nestjs/common';
 import { MagicLinkService } from './magic-link.service';
 
 @Controller('auth')
@@ -16,8 +16,9 @@ export class MagicLinkController {
   @Get()
   validateMagicLink(@Query('token') token: string) {
     const payload = this.magicLinkService.validateToken(token);
+    console.log('Validated payload:', payload);
     if (!payload) {
-      return { valid: false };
+      throw new HttpException('Invalid or expired token', 400); 
     }
     return { valid: true, ...payload };
   }
