@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { MagicLinkModule } from './auth/magic-link.module';
+import { AuthModule } from './auth/auth.module';
 import { PromptsModule } from './prompts/prompts.module';
 import { EmailModule } from './email/email.module';
 import { EntriesModule } from './entries/entries.module';
@@ -13,7 +13,7 @@ import { AppController } from './app.controller';
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: ['.env', '.env.local'],
-  }), MagicLinkModule, PromptsModule, EmailModule, EntriesModule],
+  }), AuthModule, PromptsModule, EmailModule, EntriesModule],
   controllers: [AppController],
   providers: [AppService],
 })

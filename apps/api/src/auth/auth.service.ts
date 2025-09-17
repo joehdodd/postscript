@@ -5,10 +5,10 @@ import * as jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 
 const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || 'supersecret';
-const MAGIC_LINK_EXPIRY = '15m'; // 15 minutes
+const MAGIC_LINK_EXPIRY = '8h'; // 8 hours
 
 @Injectable()
-export class MagicLinkService {
+export class AuthService {
   async generateToken(email: string, promptId: string): Promise<string> {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
@@ -21,7 +21,6 @@ export class MagicLinkService {
   validateToken(token: string): { userId: string; promptId: string } | null {
     try {
       const payload = jwt.verify(token, MAGIC_LINK_SECRET) as { userId: string; promptId: string };
-      console.log('Token payload:', payload);
       return payload;
     } catch {
       return null;

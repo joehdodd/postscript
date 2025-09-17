@@ -1,4 +1,34 @@
 'use server';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+
+/**
+ * Extracts the token from searchParams (or cookies, if you want to extend),
+ * authenticates it, and redirects if invalid. Returns the auth result.
+ */
+export async function requireAuth(searchParams: {
+  [key: string]: string | string[] | undefined;
+}) {
+  const tokenParam = (await searchParams).token;
+  const search = new URLSearchParams(
+    Array.isArray(tokenParam)
+      ? tokenParam.map((t) => ['token', t])
+      : [['token', tokenParam || '']],
+  );
+  const cookieStore = await cookies();
+  let token = cookieStore.get('token')?.value;
+  if (!token) {
+    const urlToken = search.get('token') || undefined;
+    token = urlToken;
+  }
+  if (!token) {
+    redirect('/');
+  }
+  const authResult = await auth(token);
+  return authResult;
+}
+
+// getTokenFromCookieOrSearchParams is no longer needed, logic moved to requireAuth
 
 export async function auth(token: string | string[]) {
   const res = await fetch(
@@ -10,5 +40,9 @@ export async function auth(token: string | string[]) {
   if (!res.ok) {
     return { valid: false };
   }
-  return res.json() as Promise<{ valid: boolean; userId?: string; promptId?: string }>;
+  return res.json() as Promise<{
+    valid: boolean;
+    userId?: string;
+    promptId?: string;
+  }>;
 }

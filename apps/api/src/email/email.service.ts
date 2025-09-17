@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
-import { MagicLinkService } from 'src/auth/magic-link.service';
+import { AuthService } from 'src/auth/auth.service';
 import { PromptsService } from 'src/prompts/prompts.service';
 
 @Injectable()
 export class EmailService {
   constructor(
     private readonly promptsService: PromptsService,
-    private readonly magicLinkService: MagicLinkService,
+    private readonly authService: AuthService,
   ) {}
   private resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -16,7 +16,7 @@ export class EmailService {
       prompt,
       email,
     );
-    const magicLinkToken = await this.magicLinkService.generateToken(
+    const magicLinkToken = await this.authService.generateToken(
       email,
       generatedPrompt.id,
     );
