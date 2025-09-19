@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { Card } from '@repo/ui/card';
+import { Card } from '../components/Card';
 import EntryForm from '../components/EntryForm';
 import Prompt from '../components/Prompt';
 import { requireAuth } from '../actions/auth';
