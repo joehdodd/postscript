@@ -20,17 +20,21 @@ FROM base AS build
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
-# Install node modules
-# Copy root package.json and workspace structure
+# Copy root package.json and necessary workspace packages
 COPY package.json ./
+COPY apps/api ./apps/api
+COPY packages ./packages
 
-# Now install dependencies (workspace packages will be resolved locally)
+# Install all dependencies from root (to resolve @repo/* workspace packages)
 RUN npm install --include=dev
 
-# Generate Prisma Client from root with proper binary handling
+# Generate Prisma Client
 RUN npx prisma generate --schema=./packages/prisma/schema.prisma
 
+# Build the API application
+WORKDIR /app/apps/api
 RUN npm run build
+
 
 # Final stage for app image
 FROM base
@@ -40,10 +44,12 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y openssl && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Copy built application
-COPY --from=build /app /app
+# Copy built application and necessary files
+COPY --from=build /app/apps/api/dist ./dist
+COPY --from=build /app/apps/api/package.json ./package.json
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages/prisma ./packages/prisma
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-WORKDIR /app/apps/api
-CMD [ "npm", "run", "start" ]
+CMD [ "node", "dist/main" ]
