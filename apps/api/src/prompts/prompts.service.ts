@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@repo/prisma';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
 
 @Injectable()
 export class PromptsService {
-  private prisma = new PrismaClient();
   constructor(private configService: ConfigService) {}
 
   async generateDailyPrompt(): Promise<string> {
@@ -26,16 +25,16 @@ export class PromptsService {
   }
 
   async getPromptById(id: string) {
-    return this.prisma.prompt.findUnique({
+    return prisma.prompt.findUnique({
       where: { id },
     });
   }
 
   async createPrompt(content: string, email: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
-    return this.prisma.prompt.create({
+    return prisma.prompt.create({
       data: {
         content,
         frequency: 'daily',

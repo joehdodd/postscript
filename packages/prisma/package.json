@@ -1,0 +1,27 @@
+{
+  "name": "@repo/prisma",
+  "version": "0.1.0",
+  "description": "Prisma schema and client for Postscript application",
+  "main": "index.js",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset",
+    "studio": "prisma studio",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.20.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.20.0"
+  },
+  "files": [
+    "schema.prisma",
+    "migrations/",
+    "index.js",
+    "index.d.ts"
+  ]
+}

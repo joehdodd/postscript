@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@repo/prisma';
 import * as jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 
 const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || 'supersecret';
 const MAGIC_LINK_EXPIRY = '8h'; // 8 hours
