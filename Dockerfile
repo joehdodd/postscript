@@ -21,17 +21,27 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
 # Install node modules
+# Copy package.json files first for better Docker layer caching
 COPY package.json ./
+COPY apps/*/package.json ./apps/*/
+COPY packages/*/package.json ./packages/*/
+
+# Copy all workspace source code (needed for workspace dependencies)
+COPY apps ./apps
+COPY packages ./packages
+
+# Now install dependencies (workspace packages will be resolved locally)
 RUN npm install --include=dev
 
 # Generate Prisma Client
-RUN npx prisma generate
-
-# Copy application code
-COPY . .
+WORKDIR /app/packages/prisma
+RUN npm run generate
+WORKDIR /app
 
 # Build application
+WORKDIR /app/apps/api
 RUN npm run build
+WORKDIR /app
 
 
 # Final stage for app image
@@ -47,4 +57,5 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
+WORKDIR /app/apps/api
 CMD [ "npm", "run", "start" ]
