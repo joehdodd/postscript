@@ -32,8 +32,6 @@ RUN npm install --include=dev
 # Generate Prisma Client from root with proper binary handling
 RUN npx prisma generate --schema=./packages/prisma/schema.prisma
 
-# Build application
-WORKDIR /app/apps/api
 RUN npm run build
 
 # Final stage for app image
