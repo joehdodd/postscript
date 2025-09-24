@@ -20,7 +20,7 @@ export class EmailService {
       email,
       generatedPrompt.id,
     );
-    const magicLink = `http://localhost:3001/entry?token=${magicLinkToken}`;
+    const magicLink = `${process.env.WEB_APP_URL}/entry?token=${magicLinkToken}`;
     await this.resend.emails.send({
       from: 'P.s. <noreply@prompts.postscript.ink>',
       to: [email],
