@@ -29,10 +29,8 @@ COPY packages ./packages
 # Now install dependencies (workspace packages will be resolved locally)
 RUN npm install --include=dev
 
-# Generate Prisma Client
-WORKDIR /app/packages/prisma
-RUN npm run generate
-WORKDIR /app
+# Generate Prisma Client from root with proper binary handling
+RUN npx prisma generate --schema=./packages/prisma/schema.prisma
 
 # Build application
 WORKDIR /app/apps/api
