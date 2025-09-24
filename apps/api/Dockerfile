@@ -25,7 +25,6 @@ COPY package.json ./
 RUN npm install --include=dev
 
 # Generate Prisma Client
-COPY prisma .
 RUN npx prisma generate
 
 # Copy application code
