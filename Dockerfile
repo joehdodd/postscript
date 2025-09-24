@@ -23,8 +23,6 @@ RUN apt-get update -qq && \
 # Install node modules
 # Copy root package.json and workspace structure
 COPY package.json ./
-COPY apps ./apps
-COPY packages ./packages
 
 # Now install dependencies (workspace packages will be resolved locally)
 RUN npm install --include=dev
