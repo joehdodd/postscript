@@ -6,14 +6,14 @@ import { cookies } from 'next/headers';
  * Extracts the token from searchParams (or cookies, if you want to extend),
  * authenticates it, and redirects if invalid. Returns the auth result.
  */
-export async function requireAuth(searchParams: {
-  [key: string]: string | string[] | undefined;
-}) {
-  const tokenParam = (await searchParams).token;
+export async function requireAuth(
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>,
+) {
+  const params = await searchParams;
   const search = new URLSearchParams(
-    Array.isArray(tokenParam)
-      ? tokenParam.map((t) => ['token', t])
-      : [['token', tokenParam || '']],
+    Array.isArray(params.token)
+      ? params.token.map((t) => ['token', t])
+      : [['token', params.token || '']],
   );
   const cookieStore = await cookies();
   let token = cookieStore.get('token')?.value;

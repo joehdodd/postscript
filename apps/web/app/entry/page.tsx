@@ -7,7 +7,7 @@ import { fetchPrompt } from '../actions/prompt';
 import { fetchEntryByPromptAndUser } from '../actions/entry';
 
 type EntryPageProps = {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function Entry({ searchParams }: EntryPageProps) {
