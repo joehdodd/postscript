@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Skip middleware for home page and other public routes
+  if (pathname === '/' || pathname === '/login') {
+    return NextResponse.next();
+  }
+
   // Try to get token from cookies
   let token = request.cookies.get('token')?.value;
 
