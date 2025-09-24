@@ -33,10 +33,7 @@ RUN npm install --include=dev
 RUN npx prisma generate --schema=./packages/prisma/schema.prisma
 
 # Build application
-WORKDIR /app/apps/api
-RUN npm run build
-WORKDIR /app
-
+RUN npm run build --workspace=api
 
 # Final stage for app image
 FROM base
