@@ -21,12 +21,8 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential node-gyp openssl pkg-config python-is-python3
 
 # Install node modules
-# Copy package.json files first for better Docker layer caching
+# Copy root package.json and workspace structure
 COPY package.json ./
-COPY apps/*/package.json ./apps/*/
-COPY packages/*/package.json ./packages/*/
-
-# Copy all workspace source code (needed for workspace dependencies)
 COPY apps ./apps
 COPY packages ./packages
 
