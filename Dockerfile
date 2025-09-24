@@ -27,7 +27,7 @@ COPY apps ./apps
 COPY packages ./packages
 
 # Now install dependencies (workspace packages will be resolved locally)
-RUN npm install --include=dev
+RUN npm install
 
 # Generate Prisma Client from root with proper binary handling
 RUN npx prisma generate --schema=./packages/prisma/schema.prisma
