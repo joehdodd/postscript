@@ -16,6 +16,7 @@ export default async function Entry({ searchParams }: EntryPageProps) {
     redirect('/');
   }
   const prompt = await fetchPrompt(promptId);
+  console.log("prompt", prompt)
   let existingEntry = null;
   if (!prompt.isOpen) {
     existingEntry = await fetchEntryByPromptAndUser(promptId, userId);
@@ -23,14 +24,13 @@ export default async function Entry({ searchParams }: EntryPageProps) {
   return (
     <Card className="max-w-md w-full">
       <h2 className="text-xl text-slate-600 dark:text-slate-200 font-bold">
-        Add a new entry
+        {existingEntry ? `Your Entry for ${prompt.createdAt}` : 'New Entry'}
       </h2>
       <Prompt promptId={promptId} />
       {prompt.isOpen ? (
         <EntryForm userId={userId} promptId={promptId} />
       ) : (
         <div>
-          <p className="mt-4 text-red-600">This prompt is closed for new entries.</p>
           <p>{existingEntry ? existingEntry.content : 'No existing entry found.'}</p>
         </div>
       )}
