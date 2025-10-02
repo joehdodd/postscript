@@ -16,6 +16,11 @@ export class PromptsController {
     return this.promptsService.getPromptById(id);
   }
 
+  @Get('/user/:userId')
+  async getPromptsByUserId(@Param('userId') userId: string) {
+    return this.promptsService.getPromptsByUserId(userId);
+  }
+
   @Post()
   async createPrompt(@Body() body: { content: string; userId: string }) {
     return this.promptsService.createPrompt(body.content, body.userId);

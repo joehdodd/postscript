@@ -9,7 +9,7 @@ export function Card({
 }): JSX.Element {
   return (
     <div
-      className={`${className} p-4 rounded-md shadow-md bg-white dark:bg-gray-800`}
+      className={`${className} p-4 rounded-md shadow-md bg-white`}
     >
       {children}
     </div>

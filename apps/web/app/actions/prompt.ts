@@ -1,7 +1,7 @@
-'use server'
+'use server';
 
-export async function fetchPrompt(promptId: string) {
-  const res = await fetch(`http://localhost:3000/prompts/${promptId}`, {
+export async function fetchUserPrompts(userId: string) {
+  const res = await fetch(`http://localhost:3000/prompts/user/${userId}`, {
     cache: 'no-store',
   });
   if (!res.ok) {

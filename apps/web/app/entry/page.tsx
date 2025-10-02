@@ -3,37 +3,35 @@ import { Card } from '../components/Card';
 import EntryForm from '../components/EntryForm';
 import Prompt from '../components/Prompt';
 import { requireAuth } from '../actions/auth';
-import { fetchPrompt } from '../actions/prompt';
-import { fetchEntryByPromptAndUser } from '../actions/entry';
+import { fetchUserPrompts } from '../actions/prompt';
 
 type EntryPageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function Entry({ searchParams }: EntryPageProps) {
-  const { userId, promptId } = await requireAuth(searchParams);
-  if (!userId || !promptId) {
+  const { userId } = await requireAuth(searchParams);
+  if (!userId) {
     redirect('/');
   }
-  const prompt = await fetchPrompt(promptId);
-  console.log("prompt", prompt)
-  let existingEntry = null;
-  if (!prompt.isOpen) {
-    existingEntry = await fetchEntryByPromptAndUser(promptId, userId);
-  }
+  const prompts = await fetchUserPrompts(userId);
+  console.log('prompts', prompts)
   return (
-    <Card className="max-w-md w-full">
-      <h2 className="text-xl text-slate-600 dark:text-slate-200 font-bold">
-        {existingEntry ? `Your Entry for ${prompt.createdAt}` : 'New Entry'}
+    <Card className="max-w-2xl w-full max-h-[400px] h-full">
+      <h2 className="text-xl text-slate-600 font-bold">
+        New Entry
       </h2>
-      <Prompt promptId={promptId} />
-      {prompt.isOpen ? (
-        <EntryForm userId={userId} promptId={promptId} />
+      {/* <Prompt promptId={promptId} /> */}
+      {/* {prompt?.isOpen ? (
+        <div>
+          <p>Fart</p>
+        </div>
+        // <EntryForm userId={userId} promptId={promptId} />
       ) : (
         <div>
           <p>{existingEntry ? existingEntry.content : 'No existing entry found.'}</p>
         </div>
-      )}
+      )} */}
     </Card>
   );
 }

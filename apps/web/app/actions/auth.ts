@@ -43,6 +43,5 @@ export async function auth(token: string | string[]) {
   return res.json() as Promise<{
     valid: boolean;
     userId?: string;
-    promptId?: string;
   }>;
 }

@@ -30,6 +30,12 @@ export class PromptsService {
     });
   }
 
+  async getPromptsByUserId(userId: string) {
+    return prisma.prompt.findMany({
+      where: { userId },
+    });
+  }
+
   async createPrompt(content: string, email: string) {
     const user = await prisma.user.findUnique({
       where: { email },
