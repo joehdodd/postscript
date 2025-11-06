@@ -1,15 +1,33 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "globalDependencies": ["**/.env.*local", "**/.env"],
-  "globalEnv": ["OPENAI_API_KEY", "DATABASE_URL", "RESEND_API_KEY", "MAGIC_LINK_SECRET", "NEST_API_URL", "PORT", "WEB_APP_URL"],
+  "globalDependencies": [
+    "**/.env.*local",
+    "**/.env"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "OPENAI_API_KEY",
+    "DATABASE_URL",
+    "RESEND_API_KEY",
+    "MAGIC_LINK_SECRET",
+    "NEST_API_URL",
+    "PORT",
+    "WEB_APP_URL"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
     },
     "lint": {},
     "test": {},
