@@ -11,12 +11,8 @@ type Prompt = {
     isOpen: boolean;
 };
 
-type PromptPageProps = {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export default async function Prompt({ searchParams }: PromptPageProps) {
-    const { userId } = await requireAuth(searchParams);
+export default async function Prompt() {
+    const { userId } = await requireAuth();
     if (!userId) {
         redirect('/');
     }
