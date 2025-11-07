@@ -1,44 +1,65 @@
 'use server';
+import { prisma } from '@repo/prisma';
+import { revalidatePath } from 'next/cache';
 
+/**
+ * Create a new entry for a prompt
+ * Now uses direct Prisma access instead of calling NestJS API
+ */
 export async function createEntry(
   data: FormData,
   userId: string,
   promptId: string,
 ) {
-  const jsonData = Object.fromEntries(data.entries());
-  const res = await fetch('http://localhost:3000/entries', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      ...jsonData,
-      userId,
-      promptId,
-    }),
-  });
-  if (!res.ok) {
+  try {
+    const content = data.get('content') as string;
+    
+    if (!content || !content.trim()) {
+      throw new Error('Content is required');
+    }
+
+    // Create the entry
+    await prisma.entry.create({
+      data: {
+        content: content.trim(),
+        userId,
+        promptId,
+      },
+    });
+
+    // Close the prompt after entry is created
+    await prisma.prompt.update({
+      where: { id: promptId },
+      data: { isOpen: false },
+    });
+
+    // Revalidate the entry page
+    revalidatePath('/entry');
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating entry:', error);
     throw new Error('Failed to create entry');
   }
 }
 
+/**
+ * Fetch an entry by prompt and user
+ * Now uses direct Prisma access instead of calling NestJS API
+ */
 export async function fetchEntryByPromptAndUser(
   promptId: string,
   userId: string,
 ) {
-  const res = await fetch(
-    `http://localhost:3000/entries/prompt/${promptId}/user/${userId}`,
-    {
-      cache: 'no-store',
-    },
-  );
-  if (!res.ok) {
-    throw new Error('Failed to fetch entry');
+  try {
+    return await prisma.entry.findFirst({
+      where: {
+        promptId,
+        userId,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching entry:', error);
+    return null;
   }
-  return res.json() as Promise<{
-    id: string;
-    content: string;
-    userId: string;
-    promptId: string;
-  } | null>;
 }

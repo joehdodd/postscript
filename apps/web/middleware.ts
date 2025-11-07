@@ -1,40 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// apps/web/middleware.ts
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Skip middleware for home page and other public routes
+
   if (pathname === '/' || pathname === '/login') {
     return NextResponse.next();
   }
 
-  // Try to get token from cookies
-  let token = request.cookies.get('token')?.value;
-
-  // Try to get token from URL (search params)
   const url = new URL(request.url);
   const urlToken = url.searchParams.get('token');
+  let token = request.cookies.get('token')?.value;
 
-  const response = NextResponse.next();
-
-  const maxAge = 60 * 60 * 24 * 7; // 7 days in seconds
-
-  if (urlToken && urlToken !== token) {
-    // If token is in URL and different from cookie, set it in cookies
-    response.cookies.set('token', urlToken, { path: '/', maxAge });
+  // If we have a URL token, use it and update cookie
+  if (urlToken) {
     token = urlToken;
-  } else if (token) {
-    // Refresh cookie expiration if token is present
-    response.cookies.set('token', token, { path: '/', maxAge });
+    const response = NextResponse.next();
+    response.cookies.set('token', urlToken, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+      httpOnly: true, // SECURITY: prevent XSS
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+      sameSite: 'lax', // CSRF protection
+    });
+
+    // Clean URL by removing token param
+    url.searchParams.delete('token');
+    return NextResponse.redirect(url, { status: 302 });
   }
 
-  // If neither cookie nor URL has a token, redirect to home
-  if (!token) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Refresh existing cookie
+  if (token) {
+    const response = NextResponse.next();
+    response.cookies.set('token', token, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return response;
   }
 
-  return response;
+  // No token found - redirect to home
+  return NextResponse.redirect(new URL('/', request.url));
 }
 
 // Optionally, export config for matcher if you want to limit middleware scope
-export const config = { matcher: ['/((?!api|_next/static|_next/image|favicon.ico|installHook.js.map).*)'] };
+export const config = {
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|installHook.js.map).*)',
+  ],
+};

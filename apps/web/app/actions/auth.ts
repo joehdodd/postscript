@@ -1,47 +1,50 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { validateTokenWithUser, getUserIdFromToken } from '@/lib/auth';
 
 /**
- * Extracts the token from searchParams (or cookies, if you want to extend),
- * authenticates it, and redirects if invalid. Returns the auth result.
+ * Validate session from cookie only (no prompt context)
+ * Use this for general authenticated pages
+ * Now uses direct Prisma access instead of calling NestJS API
  */
-export async function requireAuth(
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>,
-) {
-  const params = await searchParams;
-  const search = new URLSearchParams(
-    Array.isArray(params.token)
-      ? params.token.map((t) => ['token', t])
-      : [['token', params.token || '']],
-  );
+export async function requireAuth(): Promise<{ valid: boolean; userId?: string }> {
   const cookieStore = await cookies();
-  let token = cookieStore.get('token')?.value;
-  if (!token) {
-    const urlToken = search.get('token') || undefined;
-    token = urlToken;
-  }
+  const token = cookieStore.get('token')?.value;
+  
   if (!token) {
     redirect('/');
   }
-  const authResult = await auth(token);
-  return authResult;
+  
+  // Direct validation with Prisma - no API call
+  const result = await validateTokenWithUser(token);
+  
+  if (!result.valid || !result.userId) {
+    redirect('/');
+  }
+  
+  return {
+    valid: true,
+    userId: result.userId,
+  };
 }
 
-// getTokenFromCookieOrSearchParams is no longer needed, logic moved to requireAuth
-
-export async function auth(token: string | string[]) {
-  const res = await fetch(
-    `${process.env.NEST_API_URL}/auth?token=${Array.isArray(token) ? token.join(',') : token}`,
-    {
-      cache: 'no-store',
-    },
-  );
-  if (!res.ok) {
-    return { valid: false };
+/**
+ * Get current user ID from session
+ * Returns null if not authenticated
+ * Now uses direct token validation instead of calling NestJS API
+ */
+export async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    
+    if (!token) {
+      return null;
+    }
+    
+    return getUserIdFromToken(token);
+  } catch {
+    return null;
   }
-  return res.json() as Promise<{
-    valid: boolean;
-    userId?: string;
-  }>;
 }
