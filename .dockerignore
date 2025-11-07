@@ -1,6 +1,47 @@
+# Git
 /.git
+.gitignore
+
+# Dependencies
 /node_modules
-.dockerignore
+npm-debug.log*
+yarn-debug.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist
+build
+.next
+out
+.turbo
+
+# Environment files
 .env
+.env.*
+!.env.example
+
+# Docker
+.dockerignore
 Dockerfile
 fly.toml
+docker-compose.yml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+coverage
+*.test.ts
+*.spec.ts
+test/
+
+# Misc
+README.md
+*.log

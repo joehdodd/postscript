@@ -1,0 +1,59 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: postscript-db
+    restart: unless-stopped
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postscript
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NestJS API - Background scheduler
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: postscript-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postscript?schema=public
+      MAGIC_LINK_SECRET: ${MAGIC_LINK_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      WEB_APP_URL: ${WEB_APP_URL:-http://localhost:3001}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Next.js Web App
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: postscript-web
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postscript?schema=public
+      MAGIC_LINK_SECRET: ${MAGIC_LINK_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:

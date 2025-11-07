@@ -5,12 +5,8 @@ import Prompt from '../components/Prompt';
 import { requireAuth } from '../actions/auth';
 import { fetchUserPrompts } from '../actions/prompt';
 
-type EntryPageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export default async function Entry({ searchParams }: EntryPageProps) {
-  const { userId } = await requireAuth(searchParams);
+export default async function Entry() {
+  const { userId } = await requireAuth();
   if (!userId) {
     redirect('/');
   }

@@ -31,7 +31,7 @@ export class SchedulerService {
           // Get a prompt (for now using a simple placeholder)
           // TODO: Implement prompt generation strategy
           const promptContent = this.getPromptForToday();
-          
+
           await this.emailService.sendPrompt(user.email, promptContent);
           this.logger.log(`Sent prompt to ${user.email}`);
         } catch (error) {
@@ -50,7 +50,7 @@ export class SchedulerService {
    * TODO: Replace with actual prompt generation strategy
    */
   private getPromptForToday(): string {
-    const prompts = [
+    const prompts: string[] = [
       'What made you smile today?',
       'What are you grateful for right now?',
       'What challenged you today and how did you respond?',
@@ -59,9 +59,8 @@ export class SchedulerService {
       'What are you looking forward to tomorrow?',
       'What was the most meaningful part of your day?',
     ];
-    
-    // Simple rotation based on day of year
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
-    return prompts[dayOfYear % prompts.length];
+
+    const random = Math.floor(Math.random() * prompts.length);
+    return prompts[random] ?? 'What made you smile today?';
   }
 }
