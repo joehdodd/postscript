@@ -47,7 +47,7 @@ export async function generateMagicLinkToken(
  * Validate a magic link token and return the payload
  * This replaces the NestJS auth service validation
  */
-export function validateMagicLinkToken(token: string): TokenPayload | null {
+export async function validateMagicLinkToken(token: string): Promise<TokenPayload | null> {
   try {
     const payload = jwt.verify(token, MAGIC_LINK_SECRET) as TokenPayload;
     return payload;
@@ -60,8 +60,8 @@ export function validateMagicLinkToken(token: string): TokenPayload | null {
 /**
  * Extract just the userId from a token (for session management)
  */
-export function getUserIdFromToken(token: string): string | null {
-  const payload = validateMagicLinkToken(token);
+export async function getUserIdFromToken(token: string): Promise<string | null> {
+  const payload = await validateMagicLinkToken(token);
   return payload?.userId || null;
 }
 
@@ -74,7 +74,7 @@ export async function validateTokenWithUser(token: string): Promise<{
   promptId?: string;
   purpose?: 'entry' | 'auth';
 }> {
-  const payload = validateMagicLinkToken(token);
+  const payload = await validateMagicLinkToken(token);
 
   if (!payload) {
     return { valid: false };

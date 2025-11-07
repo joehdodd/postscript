@@ -49,7 +49,8 @@ export class EmailService {
       const magicLink = `${process.env.WEB_APP_URL}/entry?token=${token}`;
 
       // Send email
-      await this.resend.emails.send({
+      console.log(process.env.RESEND_API_KEY);
+      const sender = await this.resend.emails.send({
         from: 'P.s. <noreply@prompts.postscript.ink>',
         to: [email],
         subject: 'Your Prompt for Today',
@@ -69,6 +70,8 @@ export class EmailService {
           </div>
         `,
       });
+
+      console.log('Email sent:', sender);
 
       this.logger.log(`Sent prompt to ${email} (prompt ID: ${prompt.id})`);
       return prompt;
