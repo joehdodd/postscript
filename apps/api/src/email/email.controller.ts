@@ -5,11 +5,6 @@ import { EmailService } from './email.service';
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
-  /**
-   * Manually send a prompt email to a user
-   * POST /email/send-prompt
-   * Body: { email: string, prompt?: string }
-   */
   @Post('send-prompt')
   @HttpCode(HttpStatus.OK)
   async sendPrompt(
@@ -25,7 +20,6 @@ export class EmailController {
     }
 
     try {
-      // Use provided prompt or generate a default one
       const promptContent = prompt || this.getDefaultPrompt();
       
       const result = await this.emailService.sendPrompt(email, promptContent);

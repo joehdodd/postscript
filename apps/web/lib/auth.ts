@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '@repo/prisma';
 
-const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || 'supersecret';
+const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || '';
 const MAGIC_LINK_EXPIRY = '8h';
 
 interface TokenPayload {
@@ -41,6 +41,7 @@ export async function generateMagicLinkToken(
 
 export async function validateMagicLinkToken(token: string): Promise<TokenPayload | null> {
   try {
+    console.log('Validating token:', token, MAGIC_LINK_SECRET);
     const payload = jwt.verify(token, MAGIC_LINK_SECRET) as TokenPayload;
     return payload;
   } catch (error) {

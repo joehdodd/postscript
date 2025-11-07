@@ -11,19 +11,13 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private resend = new Resend(process.env.RESEND_API_KEY);
 
-  /**
-   * Send a prompt email with magic link
-   * Now self-contained with direct Prisma access
-   */
   async sendPrompt(email: string, promptContent: string) {
     try {
-      // Get user
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         throw new Error(`User not found: ${email}`);
       }
 
-      // Create prompt in database
       const prompt = await prisma.prompt.create({
         data: {
           content: promptContent,
@@ -34,7 +28,6 @@ export class EmailService {
         },
       });
 
-      // Generate magic link token
       const token = jwt.sign(
         { 
           userId: user.id, 
