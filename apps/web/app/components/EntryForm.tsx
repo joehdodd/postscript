@@ -13,11 +13,11 @@ export default function EntryForm({
       action={async (formData: FormData) => {
         await createEntry(formData, userId, promptId);
       }}
-      className="mt-4 flex flex-col gap-4"
+      className="h-full mt-4 flex flex-col gap-4"
     >
       <textarea
         name="content"
-        className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-100"
+        className="w-full h-[65%] p-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-100"
         rows={5}
         placeholder="Write your thoughts here..."
       ></textarea>

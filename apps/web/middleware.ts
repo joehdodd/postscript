@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// apps/web/middleware.ts
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes
   if (pathname === '/' || pathname === '/login' || pathname === '/dev') {
     return NextResponse.next();
   }
@@ -13,7 +11,6 @@ export function middleware(request: NextRequest) {
   const urlToken = url.searchParams.get('token');
   const token = request.cookies.get('token')?.value;
 
-  // If we have a URL token, validate and set cookie
   if (urlToken) {
     const response = NextResponse.next();
     response.cookies.set('token', urlToken, {
@@ -26,7 +23,6 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Refresh existing cookie
   if (token) {
     const response = NextResponse.next();
     response.cookies.set('token', token, {
@@ -39,7 +35,6 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // No token found - redirect to home
   return NextResponse.redirect(new URL('/', request.url));
 }
 
