@@ -40,15 +40,13 @@ export class EmailService {
       const token = jwt.sign(
         {
           userId: user.id,
-          promptId: prompt.id,
-          purpose: 'entry',
           email: user.email,
         },
         secret,
         { expiresIn: MAGIC_LINK_EXPIRY },
       );
 
-      const magicLink = `${process.env.WEB_APP_URL}/entry?token=${token}`;
+      const magicLink = `${process.env.WEB_APP_URL}/entry/${prompt.id}?token=${token}`;
 
       const sender = await this.resend.emails.send({
         from: '_postscript <noreply@prompts.postscript.ink>',

@@ -8,7 +8,6 @@ export default function Navigation() {
 
   const navItems = [
     { href: '/', label: 'Home' },
-    { href: '/entry', label: 'Write Entry' },
     { href: '/prompt', label: 'Your Prompts' },
   ];
 

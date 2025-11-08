@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import Navigation from './components/Navigation';
+import ConditionalNavigation from './components/ConditionalNavigation';
 
 export const metadata: Metadata = {
   title: '_postscript',
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-ps-primary text-ps-primary">
-        <Navigation />
+        <ConditionalNavigation />
         {children}
       </body>
     </html>

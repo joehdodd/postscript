@@ -6,8 +6,7 @@ const MAGIC_LINK_EXPIRY = '8h';
 
 interface TokenPayload {
   userId: string;
-  promptId?: string;
-  purpose: 'entry' | 'auth';
+  email: string;
 }
 
 function getMagicLinkSecret(): string {
@@ -20,10 +19,7 @@ function getMagicLinkSecret(): string {
 
 export async function generateMagicLinkToken(
   email: string,
-  options: { promptId?: string; purpose?: 'entry' | 'auth' } = {},
 ): Promise<string | null> {
-  const { promptId, purpose = 'auth' } = options;
-
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -35,8 +31,7 @@ export async function generateMagicLinkToken(
 
     const payload: TokenPayload = {
       userId: user.id,
-      purpose,
-      ...(promptId && { promptId }),
+      email: user.email,
     };
 
     const secret = getMagicLinkSecret();
@@ -56,10 +51,7 @@ export async function validateMagicLinkToken(
   try {
     const secret = getMagicLinkSecret();
 
-    const payload = jwt.verify(
-      token,
-      secret,
-    ) as TokenPayload;
+    const payload = jwt.verify(token, secret) as TokenPayload;
     return payload;
   } catch (error) {
     console.error('Error validating token:', error);
@@ -77,8 +69,7 @@ export async function getUserIdFromToken(
 export async function validateTokenWithUser(token: string): Promise<{
   valid: boolean;
   userId?: string;
-  promptId?: string;
-  purpose?: 'entry' | 'auth';
+  email?: string;
 }> {
   const payload = await validateMagicLinkToken(token);
 
@@ -97,7 +88,6 @@ export async function validateTokenWithUser(token: string): Promise<{
   return {
     valid: true,
     userId: payload.userId,
-    ...(payload.promptId && { promptId: payload.promptId }),
-    purpose: payload.purpose,
+    email: payload.email,
   };
 }
