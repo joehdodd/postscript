@@ -6,7 +6,7 @@ import { validateTokenWithUser, getUserIdFromToken } from '@/lib/auth';
 export async function requireAuth(): Promise<{
   valid: boolean;
   userId?: string;
-  promptId?: string;
+  email?: string;
 }> {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
@@ -22,7 +22,7 @@ export async function requireAuth(): Promise<{
   return {
     valid: true,
     userId: result.userId,
-    ...(result.promptId && { promptId: result.promptId }),
+    email: result.email,
   };
 }
 

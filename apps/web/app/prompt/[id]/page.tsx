@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { Card } from '../../components/Card';
 import { fetchPrompt } from '../../actions/prompt';
 import { fetchEntryByPromptAndUser } from '../../actions/entry';
 import { requireAuth } from '../../actions/auth';
 
 type PromptPageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function PromptDetail({ params }: PromptPageProps) {
@@ -81,8 +82,8 @@ export default async function PromptDetail({ params }: PromptPageProps) {
                 Your Response
               </h2>
               {prompt.isOpen && !existingEntry && (
-                <a
-                  href={`/entry/${id}`} // You might need to adjust this URL structure
+                <Link
+                  href={`/entry/${id}`}
                   className="px-4 py-2 rounded-md text-white text-sm font-medium"
                   style={{
                     background:
@@ -90,7 +91,7 @@ export default async function PromptDetail({ params }: PromptPageProps) {
                   }}
                 >
                   Write Entry
-                </a>
+                </Link>
               )}
             </div>
 
@@ -124,19 +125,19 @@ export default async function PromptDetail({ params }: PromptPageProps) {
           {/* Actions */}
           <div className="pt-4 border-t border-gray-200">
             <div className="flex gap-3">
-              <a
+              <Link
                 href="/prompt"
                 className="px-4 py-2 text-sm font-medium text-ps-secondary border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 ← Back to Prompts
-              </a>
+              </Link>
               {existingEntry && (
-                <a
-                  href={`/entry/${existingEntry.id}`} // You might want to create an entry detail page
+                <Link
+                  href={`/entry/${existingEntry.id}`}
                   className="px-4 py-2 text-sm font-medium text-ps-primary hover:text-ps-secondary transition-colors"
                 >
                   View Full Entry →
-                </a>
+                </Link>
               )}
             </div>
           </div>

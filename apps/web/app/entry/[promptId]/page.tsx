@@ -8,7 +8,7 @@ import { fetchEntryByPromptAndUser } from '../../actions/entry';
 import Link from 'next/link';
 
 interface EntryPageProps {
-  params: { promptId: string };
+  params: Promise<{ promptId: string }>;
 }
 
 export default async function Entry({ params }: EntryPageProps) {
@@ -17,7 +17,7 @@ export default async function Entry({ params }: EntryPageProps) {
     redirect('/');
   }
 
-  const { promptId } = params;
+  const { promptId } = await params;
 
   const prompt = promptId
     ? await fetchPrompt(promptId)
