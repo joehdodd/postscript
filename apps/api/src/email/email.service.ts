@@ -3,7 +3,6 @@ import { Resend } from 'resend';
 import { prisma } from '@repo/prisma';
 import * as jwt from 'jsonwebtoken';
 
-const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || 'supersecret';
 const MAGIC_LINK_EXPIRY = '8h';
 
 @Injectable()
@@ -35,9 +34,10 @@ export class EmailService {
           purpose: 'entry',
           email: user.email,
         },
-        MAGIC_LINK_SECRET,
+        process.env.MAGIC_LINK_SECRET,
         { expiresIn: MAGIC_LINK_EXPIRY }
       );
+      console.log('Generated token:', token, 'MAGIC_LINK_SECRET:', process.env.MAGIC_LINK_SECRET);
 
       const magicLink = `${process.env.WEB_APP_URL}/entry?token=${token}`;
 
