@@ -1,10 +1,99 @@
 @import 'tailwindcss';
 
+/* Postscript Color Palette - Calm & Deep */
+:root {
+  /* Primary - Deep Ocean Blue */
+  --ps-primary-50: #f0f6ff;
+  --ps-primary-100: #e0edff;
+  --ps-primary-200: #c7ddff;
+  --ps-primary-300: #a4c7ff;
+  --ps-primary-400: #8ba9ff;
+  --ps-primary-500: #6b82ff;
+  --ps-primary-600: #455cf5;
+  --ps-primary-700: #3b4dd8;
+  --ps-primary-800: #2d3ba3;
+  --ps-primary-900: #1e2751;
+
+  /* Secondary - Deep Forest Green */
+  --ps-secondary-50: #f0f9f4;
+  --ps-secondary-100: #dcf2e4;
+  --ps-secondary-200: #bce5cd;
+  --ps-secondary-300: #8cd2ab;
+  --ps-secondary-400: #4fb57f;
+  --ps-secondary-500: #2d965c;
+  --ps-secondary-600: #1f7a47;
+  --ps-secondary-700: #1a623a;
+  --ps-secondary-800: #174e30;
+  --ps-secondary-900: #123f26;
+
+  /* Accent - Warm Terracotta */
+  --ps-accent-50: #fef7f0;
+  --ps-accent-100: #feede1;
+  --ps-accent-200: #fdd8c2;
+  --ps-accent-300: #fbbc97;
+  --ps-accent-400: #f89665;
+  --ps-accent-500: #f47142;
+  --ps-accent-600: #e55528;
+  --ps-accent-700: #c03f1e;
+  --ps-accent-800: #9a341e;
+  --ps-accent-900: #7c2e1c;
+
+  /* Neutrals - Sophisticated Grays */
+  --ps-neutral-50: #f8fafc;
+  --ps-neutral-100: #f1f5f9;
+  --ps-neutral-200: #e2e8f0;
+  --ps-neutral-300: #cbd5e1;
+  --ps-neutral-400: #94a3b8;
+  --ps-neutral-500: #64748b;
+  --ps-neutral-600: #475569;
+  --ps-neutral-700: #334155;
+  --ps-neutral-800: #1e293b;
+  --ps-neutral-900: #0f172a;
+
+  /* Semantic Colors */
+  --ps-success: var(--ps-secondary-600);
+  --ps-warning: var(--ps-accent-500);
+  --ps-danger: #dc2626;
+  --ps-info: var(--ps-primary-500);
+}
+
+/* Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Adjust neutrals for dark mode */
+    --ps-bg-primary: var(--ps-neutral-900);
+    --ps-bg-secondary: var(--ps-neutral-800);
+    --ps-text-primary: var(--ps-neutral-100);
+    --ps-text-secondary: var(--ps-neutral-400);
+    --ps-border: var(--ps-neutral-700);
+  }
+}
+
+/* Light Mode */
+@media (prefers-color-scheme: light) {
+  :root {
+    --ps-bg-primary: var(--ps-neutral-50);
+    --ps-bg-secondary: var(--ps-neutral-100);
+    --ps-text-primary: var(--ps-neutral-800);
+    --ps-text-secondary: var(--ps-neutral-600);
+    --ps-border: var(--ps-neutral-200);
+  }
+}
+
+/* Utility Classes */
+.text-ps-primary { color: var(--ps-text-primary); }
+.text-ps-secondary { color: var(--ps-text-secondary); }
+.bg-ps-primary { background-color: var(--ps-bg-primary); }
+.bg-ps-secondary { background-color: var(--ps-bg-secondary); }
+.border-ps { border-color: var(--ps-border); }
+
 body {
   box-sizing: border-box;
   margin: 0;
   overflow: hidden;
   height: 100vh;
+  background-color: var(--ps-bg-primary);
+  color: var(--ps-text-primary);
 }
 
 a {

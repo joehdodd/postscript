@@ -10,6 +10,14 @@ interface TokenPayload {
   purpose: 'entry' | 'auth';
 }
 
+function getMagicLinkSecret(): string {
+  const secret = process?.env?.MAGIC_LINK_SECRET;
+  if (!secret) {
+    throw new Error('MAGIC_LINK_SECRET environment variable is not set');
+  }
+  return secret;
+}
+
 export async function generateMagicLinkToken(
   email: string,
   options: { promptId?: string; purpose?: 'entry' | 'auth' } = {},
@@ -31,10 +39,7 @@ export async function generateMagicLinkToken(
       ...(promptId && { promptId }),
     };
 
-    const secret = process?.env?.MAGIC_LINK_SECRET;
-    if (!secret) {
-      throw new Error('MAGIC_LINK_SECRET environment variable is not set');
-    }
+    const secret = getMagicLinkSecret();
 
     return jwt.sign(payload, secret, {
       expiresIn: MAGIC_LINK_EXPIRY,
@@ -49,10 +54,7 @@ export async function validateMagicLinkToken(
   token: string,
 ): Promise<TokenPayload | null> {
   try {
-    const secret = process?.env?.MAGIC_LINK_SECRET;
-    if (!secret) {
-      throw new Error('MAGIC_LINK_SECRET environment variable is not set');
-    }
+    const secret = getMagicLinkSecret();
 
     const payload = jwt.verify(
       token,
