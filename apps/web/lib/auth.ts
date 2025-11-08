@@ -2,7 +2,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '@repo/prisma';
 
-const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET || '';
 const MAGIC_LINK_EXPIRY = '8h';
 
 interface TokenPayload {
@@ -13,7 +12,7 @@ interface TokenPayload {
 
 export async function generateMagicLinkToken(
   email: string,
-  options: { promptId?: string; purpose?: 'entry' | 'auth' } = {}
+  options: { promptId?: string; purpose?: 'entry' | 'auth' } = {},
 ): Promise<string | null> {
   const { promptId, purpose = 'auth' } = options;
 
@@ -32,17 +31,33 @@ export async function generateMagicLinkToken(
       ...(promptId && { promptId }),
     };
 
-    return jwt.sign(payload, MAGIC_LINK_SECRET, { expiresIn: MAGIC_LINK_EXPIRY });
+    const secret = process?.env?.MAGIC_LINK_SECRET;
+    if (!secret) {
+      throw new Error('MAGIC_LINK_SECRET environment variable is not set');
+    }
+
+    return jwt.sign(payload, secret, {
+      expiresIn: MAGIC_LINK_EXPIRY,
+    });
   } catch (error) {
     console.error('Error generating token:', error);
     return null;
   }
 }
 
-export async function validateMagicLinkToken(token: string): Promise<TokenPayload | null> {
+export async function validateMagicLinkToken(
+  token: string,
+): Promise<TokenPayload | null> {
   try {
-    console.log('Validating token:', token, MAGIC_LINK_SECRET);
-    const payload = jwt.verify(token, MAGIC_LINK_SECRET) as TokenPayload;
+    const secret = process?.env?.MAGIC_LINK_SECRET;
+    if (!secret) {
+      throw new Error('MAGIC_LINK_SECRET environment variable is not set');
+    }
+
+    const payload = jwt.verify(
+      token,
+      secret,
+    ) as TokenPayload;
     return payload;
   } catch (error) {
     console.error('Error validating token:', error);
@@ -50,7 +65,9 @@ export async function validateMagicLinkToken(token: string): Promise<TokenPayloa
   }
 }
 
-export async function getUserIdFromToken(token: string): Promise<string | null> {
+export async function getUserIdFromToken(
+  token: string,
+): Promise<string | null> {
   const payload = await validateMagicLinkToken(token);
   return payload?.userId || null;
 }
