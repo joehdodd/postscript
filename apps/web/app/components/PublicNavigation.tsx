@@ -13,7 +13,14 @@ export default function PublicNavigation() {
           >
             _postscript
           </Link>
-          <div className="flex items-center gap-6"></div>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/pricing"
+              className="text-ps-text-secondary hover:text-ps-primary transition-colors duration-200 font-medium"
+            >
+              Pricing
+            </Link>
+          </div>
         </div>
       </div>
     </nav>

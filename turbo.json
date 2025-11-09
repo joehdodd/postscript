@@ -12,7 +12,8 @@
     "MAGIC_LINK_SECRET",
     "NEST_API_URL",
     "PORT",
-    "WEB_APP_URL"
+    "WEB_APP_URL",
+    "STRIPE_SECRET_KEY"
   ],
   "tasks": {
     "dev": {
