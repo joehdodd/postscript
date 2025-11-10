@@ -20,6 +20,12 @@ export default function PublicNavigation() {
             >
               Pricing
             </Link>
+            <Link
+              href="/login"
+              className="text-ps-text-secondary hover:text-ps-primary transition-colors duration-200 font-medium"
+            >
+              Login
+            </Link>
           </div>
         </div>
       </div>
