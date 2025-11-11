@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { sendMagicLink } from "../login/actions";
+import { sendMagicLink } from "@/app/actions/auth";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");

@@ -1,7 +1,12 @@
 'use server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { validateTokenWithUser, getUserIdFromToken } from '@/lib/auth';
+import {
+  validateTokenWithUser,
+  getUserIdFromToken,
+  generateMagicLinkToken,
+} from '@/lib/auth';
+import { sendMagicLinkEmail } from '@/lib/email';
 
 export async function requireAuth(): Promise<{
   valid: boolean;
@@ -38,5 +43,22 @@ export async function getCurrentUserId(): Promise<string | null> {
     return getUserIdFromToken(token);
   } catch {
     return null;
+  }
+}
+
+export async function sendMagicLink(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = await generateMagicLinkToken(email);
+    if (!token) {
+      return { success: false, error: 'User not found.' };
+    }
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/?token=${token}`;
+    console.log('Generated magic link URL:', url);
+    await sendMagicLinkEmail(email, url);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Unknown error.' };
   }
 }
