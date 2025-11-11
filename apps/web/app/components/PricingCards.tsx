@@ -15,22 +15,23 @@ type PricingCardsProps = {
 
 const pricingPlans: PricingPlan[] = [
   {
-    id: 'free',
-    name: 'Free',
-    price: '$0',
-    priceId: '',
-    features: ['Basic prompts', 'Limited entries', 'Email delivery'],
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    price: '$9',
-    priceId: 'price_your_stripe_price_id_here', // Replace with actual Stripe Price ID
+    id: 'gold',
+    name: 'Gold',
+    price: '$2.50',
+    priceId: 'price_1SS2MWIwBSBptkFZZv87WG0B',
     features: [
       'Unlimited prompts',
-      'Advanced analytics',
-      'Export options',
-      'Priority support',
+    ],
+  },
+  {
+    id: 'platinum',
+    name: 'Platinum',
+    price: '$5.00',
+    priceId: 'price_1SSJBtIwBSBptkFZ8eZ2kNKk',
+    features: [
+      'Unlimited prompts',
+      'Analytics dashboard',
+      'Export entries',
     ],
   },
 ];
@@ -128,14 +129,12 @@ export default function PricingCards({
                     isLoading === plan.id ||
                     (isAuthenticated && plan.id === 'free')
                   }
-                  className={`w-full py-3 rounded-lg font-medium transition-all duration-200 ${
-                    
-                    plan.id === 'premium'
-                      ? 'text-white hover:opacity-90 hover:shadow-lg'
-                      : isAuthenticated
-                        ? 'bg-ps-neutral-100 text-ps-text-secondary cursor-not-allowed'
-                        : 'text-white hover:opacity-90 hover:shadow-lg'
-                  }`}
+                  className={`w-full py-3 rounded-lg font-medium transition-all duration-200 ${plan.id === 'premium'
+                    ? 'text-white hover:opacity-90 hover:shadow-lg'
+                    : isAuthenticated
+                      ? 'bg-ps-neutral-100 text-ps-text-secondary cursor-not-allowed'
+                      : 'text-white hover:opacity-90 hover:shadow-lg'
+                    }`}
                   style={{
                     backgroundColor:
                       plan.id === 'premium'
@@ -169,7 +168,7 @@ export default function PricingCards({
                       </svg>
                       Processing...
                     </span>
-                  ) : plan.id === 'premium' ? (
+                  ) : plan.id === 'gold' || plan.id === 'platinum' ? (
                     isAuthenticated ? (
                       'Upgrade Now'
                     ) : (
