@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { SignupForm } from './components/SignupForm';
 
 function TypewriterText() {
   const [displayText, setDisplayText] = useState('');
@@ -28,6 +30,17 @@ function TypewriterText() {
 }
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const showSignup = searchParams.get('signup') === 'true';
+
+  if (showSignup) {
+    return (
+      <div className="bg-ps-primary-50 flex items-center justify-center p-4">
+        <SignupForm />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-ps-primary-50">
       {/* Hero Section */}

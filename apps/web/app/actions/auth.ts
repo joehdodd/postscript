@@ -7,6 +7,7 @@ import {
   generateMagicLinkToken,
 } from '@/lib/auth';
 import { sendMagicLinkEmail } from '@/lib/email';
+import { prisma } from '@repo/prisma';
 
 export async function requireAuth(): Promise<{
   valid: boolean;
@@ -58,7 +59,45 @@ export async function sendMagicLink(
     console.log('Generated magic link URL:', url);
     await sendMagicLinkEmail(email, url);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Unknown error.' };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error.',
+    };
+  }
+}
+
+export async function signupUser(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          frequency: 'daily', // default frequency
+        },
+      });
+    }
+
+    const token = await generateMagicLinkToken(email);
+    if (!token) {
+      return { success: false, error: 'Failed to generate magic link.' };
+    }
+
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/?token=${token}`;
+    console.log('Generated signup magic link URL:', url);
+    await sendMagicLinkEmail(email, url);
+    return { success: true };
+  } catch (error) {
+    console.error('Signup error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error.',
+    };
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type PricingPlan = {
   id: string;
@@ -40,12 +41,13 @@ export default function PricingCards({
   isAuthenticated = false,
 }: PricingCardsProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubscribe = async (priceId: string, planId: string) => {
     if (!priceId) return;
 
     if (!isAuthenticated) {
-      window.location.href = '/?signup=true';
+      router.push('/?signup=true');
       return;
     }
 
@@ -63,7 +65,7 @@ export default function PricingCards({
       const { url } = await response.json();
 
       if (url) {
-        window.location.href = url;
+        router.push(url);
       }
     } catch (error) {
       console.error('Checkout error:', error);
