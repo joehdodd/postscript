@@ -1,37 +1,13 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { SignupForm } from './components/SignupForm';
+import TypewriterText from './components/TypewriterText';
 
-function TypewriterText() {
-  const [displayText, setDisplayText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const fullText = '_postscript';
-  const typingSpeed = 150; // milliseconds
+type PageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-  useEffect(() => {
-    if (currentIndex < fullText.length) {
-      const timeout = setTimeout(() => {
-        setDisplayText((prev) => prev + fullText[currentIndex]);
-        setCurrentIndex((prev) => prev + 1);
-      }, typingSpeed);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, fullText]);
-
-  return (
-    <h1 className="text-6xl font-bold text-ps-primary mb-6 tracking-tight">
-      {displayText}
-      <span className="animate-pulse text-ps-primary">|</span>
-    </h1>
-  );
-}
-
-export default function Home() {
-  const searchParams = useSearchParams();
-  const showSignup = searchParams.get('signup') === 'true';
+export default async function Home({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const showSignup = params.signup === 'true';
 
   if (showSignup) {
     return (
@@ -48,7 +24,8 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <TypewriterText />
           <p className="text-xl text-ps-secondary mb-8 leading-relaxed">
-            Journaling made simple for people who don&apos;t journal. Just one thoughtful prompt, delivered to your inbox when you need it.
+            Journaling made simple for people who don&apos;t journal. Just one
+            thoughtful prompt, delivered to your inbox when you need it.
           </p>
           <div className="inline-flex items-center gap-4 text-sm text-ps-secondary">
             <span className="flex items-center gap-2">
@@ -105,7 +82,8 @@ export default function Home() {
               No Blank Pages
             </h3>
             <p className="text-sm text-ps-secondary">
-              Skip the intimidating empty journal. Get a single, thoughtful question that actually makes you want to write.
+              Skip the intimidating empty journal. Get a single, thoughtful
+              question that actually makes you want to write.
             </p>
           </div>
 
@@ -135,7 +113,8 @@ export default function Home() {
               Effort-free Writing
             </h3>
             <p className="text-sm text-ps-secondary">
-              No daily commitment pressure. Write when you want, how much you want. Some days it&apos;s a sentence, others a story.
+              No daily commitment pressure. Write when you want, how much you
+              want. Some days it&apos;s a sentence, others a story.
             </p>
           </div>
 
@@ -165,7 +144,8 @@ export default function Home() {
               Finally Consistent
             </h3>
             <p className="text-sm text-ps-secondary">
-              The journaling habit that actually sticks. No guilt, no streaks to maintain—just gentle nudges when you&apos;re ready.
+              The journaling habit that actually sticks. No guilt, no streaks to
+              maintain—just gentle nudges when you&apos;re ready.
             </p>
           </div>
         </div>

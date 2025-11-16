@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 import { requireAuth } from '../actions/auth';
-import { 
-  fetchUserAccountData, 
-  fetchUserSubscription, 
-  fetchUserPaymentMethods, 
-  fetchUserInvoices 
+import {
+  fetchUserAccountData,
+  fetchUserSubscription,
+  fetchUserPaymentMethods,
+  fetchUserInvoices,
 } from '../actions/account';
 import AccountNavigation from '../components/AccountNavigation';
 import AccountInformation from '../components/AccountInformation';
@@ -42,17 +42,19 @@ export default async function AccountPage() {
           <AccountNavigation />
 
           <div className="grid lg:grid-cols-3 gap-8 mt-8">
-            {/* Main Content */}
+            {/* Main Content 
             <div className="lg:col-span-2 space-y-8">
               <AccountInformation userData={userData} />
               <PaymentMethods userId={userId} paymentMethods={paymentMethods} />
               <BillingHistory userId={userId} invoices={invoices} />
             </div>
+            */}
 
-            {/* Sidebar */}
+            {/* Sidebar 
             <div className="lg:col-span-1">
               <SubscriptionStatus userId={userId} subscription={subscription} />
             </div>
+            */}
           </div>
         </div>
       </div>
