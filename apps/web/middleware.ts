@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
     pathname === '/dev' ||
     pathname === '/pricing'
   ) {
+    console.log('Public route accessed:', pathname);
     return NextResponse.next();
   }
 

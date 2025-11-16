@@ -55,7 +55,7 @@ export async function sendMagicLink(
     if (!token) {
       return { success: false, error: 'User not found.' };
     }
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/?token=${token}`;
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/prompt?token=${token}`;
     console.log('Generated magic link URL:', url);
     await sendMagicLinkEmail(email, url);
     return { success: true };
@@ -89,7 +89,7 @@ export async function signupUser(
       return { success: false, error: 'Failed to generate magic link.' };
     }
 
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/?token=${token}`;
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/prompt?token=${token}`;
     console.log('Generated signup magic link URL:', url);
     await sendMagicLinkEmail(email, url);
     return { success: true };
