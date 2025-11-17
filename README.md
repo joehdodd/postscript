@@ -1,14 +1,6 @@
-# Turborepo starter
+# _postscript
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub Issues will be closed.
-
-## Using this example
-
-Run the following command:
-
-```bash
-npx create-turbo@latest -e with-nestjs
-```
+This is a Turbrorepo monorepo containing application code for the _postscript jouralling application. This application is intended to make journalling easier for people who don't like journalling. Users can sign up to receive journalling prompts at any frequency they choose. They then respond to those prompts with entries.
 
 ## What's inside?
 
@@ -25,7 +17,7 @@ This Turborepo includes the following packages/apps:
         ├── @repo/eslint-config       # `eslint` configurations (includes `prettier`)
         ├── @repo/jest-config         # `jest` configurations
         ├── @repo/typescript-config   # `tsconfig.json`s used throughout the monorepo
-        └── @repo/ui                  # Shareable stub React component library.
+        └── @repo/prisma              # Shareable prisma database schema and configuration.
 
 Each package and application are 100% [TypeScript](https://www.typescriptlang.org/) safe.
 
