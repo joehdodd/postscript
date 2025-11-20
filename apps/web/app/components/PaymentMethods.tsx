@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import AddPaymentMethodForm from './AddPaymentMethodForm';
 
 type PaymentMethod = {
   id: string;
@@ -17,31 +18,27 @@ type PaymentMethod = {
 type PaymentMethodsProps = {
   userId: string;
   paymentMethods?: PaymentMethod[];
+  onRefresh?: () => void;
 };
 
-export default function PaymentMethods({ paymentMethods = [] }: PaymentMethodsProps) {
+export default function PaymentMethods({ 
+  paymentMethods = [], 
+  onRefresh 
+}: PaymentMethodsProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
-  const handleAddPaymentMethod = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Integrate with Stripe to add payment method
-      const response = await fetch('/api/stripe/setup-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  const handleAddPaymentMethod = () => {
+    setShowAddForm(true);
+  };
 
-      const { clientSecret } = await response.json();
-      
-      // TODO: Use Stripe Elements to collect payment method
-      console.log('Client secret:', clientSecret);
-    } catch (error) {
-      console.error('Error adding payment method:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleAddSuccess = () => {
+    setShowAddForm(false);
+    onRefresh?.(); // Refresh the payment methods list
+  };
+
+  const handleAddCancel = () => {
+    setShowAddForm(false);
   };
 
   const handleDeletePaymentMethod = async (paymentMethodId: string) => {
@@ -49,40 +46,46 @@ export default function PaymentMethods({ paymentMethods = [] }: PaymentMethodsPr
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/stripe/payment-method', {
+      const response = await fetch(`/api/stripe/payment-methods/${paymentMethodId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ paymentMethodId }),
       });
 
       if (response.ok) {
-        // TODO: Refresh payment methods list
-        console.log('Payment method deleted');
+        onRefresh?.(); // Refresh payment methods list
+      } else {
+        const error = await response.json();
+        console.error('Delete failed:', error.error);
       }
     } catch (error) {
       console.error('Error deleting payment method:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSetDefault = async (paymentMethodId: string) => {
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/stripe/payment-method/default', {
-        method: 'POST',
+      const response = await fetch(`/api/stripe/payment-methods/${paymentMethodId}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ paymentMethodId }),
+        body: JSON.stringify({ action: 'set_default' }),
       });
 
       if (response.ok) {
-        // TODO: Refresh payment methods list
-        console.log('Default payment method updated');
+        onRefresh?.(); // Refresh payment methods list
+      } else {
+        const error = await response.json();
+        console.error('Set default failed:', error.error);
       }
     } catch (error) {
       console.error('Error updating default payment method:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,19 +107,27 @@ export default function PaymentMethods({ paymentMethods = [] }: PaymentMethodsPr
   };
 
   return (
-    <div className="bg-ps-secondary rounded-lg p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-ps-primary">
-          Payment Methods
-        </h2>
-        <button
-          onClick={handleAddPaymentMethod}
-          disabled={isLoading}
-          className="px-4 py-2 text-sm font-medium bg-ps-primary-600 text-white rounded-md hover:bg-ps-primary-700 transition-colors duration-200 disabled:opacity-50"
-        >
-          {isLoading ? 'Adding...' : 'Add Payment Method'}
-        </button>
-      </div>
+    <div className="space-y-6">
+      {showAddForm && (
+        <AddPaymentMethodForm
+          onSuccess={handleAddSuccess}
+          onCancel={handleAddCancel}
+        />
+      )}
+      
+      <div className="bg-ps-secondary rounded-lg p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-ps-primary">
+            Payment Methods
+          </h2>
+          <button
+            onClick={handleAddPaymentMethod}
+            disabled={isLoading || showAddForm}
+            className="px-4 py-2 text-sm font-medium bg-ps-primary-600 text-white rounded-md hover:bg-ps-primary-700 transition-colors duration-200 disabled:opacity-50"
+          >
+            {showAddForm ? 'Adding...' : 'Add Payment Method'}
+          </button>
+        </div>
 
       {paymentMethods.length === 0 ? (
         <div className="text-center py-8">
@@ -175,16 +186,18 @@ export default function PaymentMethods({ paymentMethods = [] }: PaymentMethodsPr
                 {!method.isDefault && (
                   <button
                     onClick={() => handleSetDefault(method.id)}
-                    className="px-3 py-1 text-sm text-ps-primary-600 hover:text-ps-primary-700 transition-colors duration-200"
+                    disabled={isLoading}
+                    className="px-3 py-1 text-sm text-ps-primary-600 hover:text-ps-primary-700 transition-colors duration-200 disabled:opacity-50"
                   >
-                    Set Default
+                    {isLoading ? 'Setting...' : 'Set Default'}
                   </button>
                 )}
                 <button
                   onClick={() => handleDeletePaymentMethod(method.id)}
-                  className="px-3 py-1 text-sm text-ps-accent-600 hover:text-ps-accent-700 transition-colors duration-200"
+                  disabled={isLoading}
+                  className="px-3 py-1 text-sm text-ps-accent-600 hover:text-ps-accent-700 transition-colors duration-200 disabled:opacity-50"
                 >
-                  Delete
+                  {isLoading ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             </div>
@@ -199,6 +212,7 @@ export default function PaymentMethods({ paymentMethods = [] }: PaymentMethodsPr
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

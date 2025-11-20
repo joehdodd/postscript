@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { redirect } from 'next/navigation';
 import { requireAuth } from '../actions/auth';
 import {
@@ -12,19 +15,70 @@ import SubscriptionStatus from '../components/SubscriptionStatus';
 import PaymentMethods from '../components/PaymentMethods';
 import BillingHistory from '../components/BillingHistory';
 
-export default async function AccountPage() {
-  const { userId } = await requireAuth();
-  if (!userId) {
-    redirect('/');
-  }
+export default function AccountPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [userData, setUserData] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [subscription, setSubscription] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [userId, setUserId] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch all account data in parallel
-  const [userData, subscription, paymentMethods, invoices] = await Promise.all([
-    fetchUserAccountData(),
-    fetchUserSubscription(),
-    fetchUserPaymentMethods(),
-    fetchUserInvoices(),
-  ]);
+  useEffect(() => {
+    loadAccountData();
+  }, []);
+
+  const loadAccountData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Check auth first
+      const authResult = await requireAuth();
+      if (!authResult.userId) {
+        redirect('/');
+        return;
+      }
+      
+      setUserId(authResult.userId);
+
+      // Fetch all account data in parallel
+      const [userDataResult, subscriptionResult, paymentMethodsResult, invoicesResult] = await Promise.all([
+        fetchUserAccountData(),
+        fetchUserSubscription(),
+        fetchUserPaymentMethods(),
+        fetchUserInvoices(),
+      ]);
+
+      setUserData(userDataResult);
+      setSubscription(subscriptionResult);
+      setPaymentMethods(paymentMethodsResult);
+      setInvoices(invoicesResult);
+    } catch (error) {
+      console.error('Error loading account data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshPaymentMethods = async () => {
+    try {
+      const result = await fetchUserPaymentMethods();
+      setPaymentMethods(result);
+    } catch (error) {
+      console.error('Error refreshing payment methods:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-ps-primary flex items-center justify-center">
+        <div className="text-ps-text-primary">Loading your account...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-ps-primary">
@@ -42,19 +96,24 @@ export default async function AccountPage() {
           <AccountNavigation />
 
           <div className="grid lg:grid-cols-3 gap-8 mt-8">
-            {/* Main Content 
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               <AccountInformation userData={userData} />
-              <PaymentMethods userId={userId} paymentMethods={paymentMethods} />
+              <PaymentMethods 
+                userId={userId} 
+                paymentMethods={paymentMethods}
+                onRefresh={refreshPaymentMethods}
+              />
               <BillingHistory userId={userId} invoices={invoices} />
             </div>
-            */}
 
-            {/* Sidebar 
+            {/* Sidebar */}
             <div className="lg:col-span-1">
-              <SubscriptionStatus userId={userId} subscription={subscription} />
+              <SubscriptionStatus 
+                userId={userId} 
+                subscription={subscription}
+              />
             </div>
-            */}
           </div>
         </div>
       </div>

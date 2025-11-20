@@ -2,6 +2,25 @@
 
 import { redirect } from 'next/navigation';
 import { requireAuth } from './auth';
+import { prisma } from '@repo/prisma';
+import Stripe from 'stripe';
+
+// Extend Stripe types for proper property access
+interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
+  current_period_start: number;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+}
+
+interface StripeInvoiceWithPaymentIntent extends Stripe.Invoice {
+  payment_intent?: {
+    client_secret?: string;
+  };
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-10-29.clover',
+});
 
 // Note: You'll need to add these fields to your User model in Prisma schema
 type UpdateAccountData = {
@@ -25,9 +44,7 @@ export async function updateAccountInformation(data: UpdateAccountData) {
   }
 
   try {
-    // TODO: Update user information in database
-    // You'll need to update your Prisma schema and add these fields to the User model
-    /*
+    // Update user information in database
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -42,9 +59,28 @@ export async function updateAccountInformation(data: UpdateAccountData) {
         addressCountry: data.address?.country,
       },
     });
-    */
 
-    console.log('Account information updated for user:', userId, 'with data:', data);
+    // Update Stripe customer if exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { stripeCustomerId: true, email: true },
+    });
+
+    if (user?.stripeCustomerId) {
+      await stripe.customers.update(user.stripeCustomerId, {
+        name: [data.firstName, data.lastName].filter(Boolean).join(' '),
+        phone: data.phone,
+        address: data.address ? {
+          line1: data.address.line1,
+          line2: data.address.line2,
+          city: data.address.city,
+          state: data.address.state,
+          postal_code: data.address.postal_code,
+          country: data.address.country,
+        } : undefined,
+      });
+    }
+
     return { success: true, message: 'Account information updated successfully' };
   } catch (error) {
     console.error('Error updating account information:', error);
@@ -59,8 +95,6 @@ export async function fetchUserAccountData() {
   }
 
   try {
-    // TODO: Fetch user data from database
-    /*
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -93,24 +127,6 @@ export async function fetchUserAccountData() {
         country: user.addressCountry || 'US',
       },
     };
-    */
-
-    // Temporary mock data - replace with actual database call
-    return {
-      id: userId,
-      email: 'user@example.com',
-      firstName: '',
-      lastName: '',
-      phone: '',
-      address: {
-        line1: '',
-        line2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: 'US',
-      },
-    };
   } catch (error) {
     console.error('Error fetching user account data:', error);
     return null;
@@ -124,31 +140,29 @@ export async function fetchUserSubscription() {
   }
 
   try {
-    // TODO: Fetch subscription data from Stripe and/or database
-    /*
     const subscription = await prisma.subscription.findFirst({
       where: { userId },
-      include: {
-        plan: true,
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!subscription) {
       return null; // No subscription (free plan)
     }
 
+    // Get fresh data from Stripe
+    const stripeSubscription = await stripe.subscriptions.retrieve(
+      subscription.stripeSubscriptionId,
+      { expand: ['latest_invoice'] }
+    ) as unknown as StripeSubscriptionWithPeriods;
+
     return {
       id: subscription.stripeSubscriptionId,
-      status: subscription.status,
-      planName: subscription.plan.name,
-      planPrice: subscription.plan.price,
-      currentPeriodEnd: subscription.currentPeriodEnd,
-      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      status: stripeSubscription.status,
+      planType: subscription.planType,
+      currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+      cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+      canceledAt: subscription.canceledAt,
     };
-    */
-
-    // Temporary mock data - replace with actual Stripe/database call
-    return null; // No subscription (free plan)
   } catch (error) {
     console.error('Error fetching user subscription:', error);
     return null;
@@ -162,10 +176,6 @@ export async function fetchUserPaymentMethods() {
   }
 
   try {
-    // TODO: Fetch payment methods from Stripe
-    /*
-    const stripe = new Stripe(getStripeSecretKey());
-    
     // Get customer from database first
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -181,16 +191,21 @@ export async function fetchUserPaymentMethods() {
       type: 'card',
     });
 
+    // Get default payment method from customer
+    const customer = await stripe.customers.retrieve(user.stripeCustomerId) as Stripe.Customer;
+    const defaultPaymentMethodId = customer.invoice_settings.default_payment_method as string;
+
     return paymentMethods.data.map((pm) => ({
       id: pm.id,
       type: pm.type,
-      card: pm.card,
-      isDefault: pm.id === user.defaultPaymentMethodId, // You'd need to track this
+      card: pm.card ? {
+        brand: pm.card.brand,
+        last4: pm.card.last4,
+        exp_month: pm.card.exp_month,
+        exp_year: pm.card.exp_year,
+      } : null,
+      isDefault: pm.id === defaultPaymentMethodId,
     }));
-    */
-
-    // Temporary mock data - replace with actual Stripe call
-    return [];
   } catch (error) {
     console.error('Error fetching payment methods:', error);
     return [];
@@ -204,10 +219,6 @@ export async function fetchUserInvoices() {
   }
 
   try {
-    // TODO: Fetch invoices from Stripe
-    /*
-    const stripe = new Stripe(getStripeSecretKey());
-    
     // Get customer from database first
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -221,23 +232,100 @@ export async function fetchUserInvoices() {
     const invoices = await stripe.invoices.list({
       customer: user.stripeCustomerId,
       limit: 20,
+      status: 'paid',
     });
 
     return invoices.data.map((invoice) => ({
       id: invoice.id,
       date: new Date(invoice.created * 1000),
       amount: invoice.total,
+      currency: invoice.currency,
       status: invoice.status,
-      description: invoice.description || `${invoice.lines.data[0]?.description}`,
+      description: invoice.description || invoice.lines.data[0]?.description || 'Subscription',
       invoiceUrl: invoice.invoice_pdf,
-      receiptUrl: invoice.receipt_number ? invoice.receipt_url : undefined,
+      receiptUrl: invoice.receipt_number ? `https://pay.stripe.com/receipts/${invoice.receipt_number}` : undefined,
     }));
-    */
-
-    // Temporary mock data - replace with actual Stripe call
-    return [];
   } catch (error) {
     console.error('Error fetching user invoices:', error);
     return [];
+  }
+}
+
+// Helper function to create or get Stripe customer
+export async function createOrGetStripeCustomer(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { 
+      stripeCustomerId: true, 
+      email: true, 
+      firstName: true, 
+      lastName: true 
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Return existing customer if available
+  if (user.stripeCustomerId) {
+    return user.stripeCustomerId;
+  }
+
+  // Create new Stripe customer
+  const customer = await stripe.customers.create({
+    email: user.email,
+    name: [user.firstName, user.lastName].filter(Boolean).join(' '),
+    metadata: {
+      userId: userId,
+    },
+  });
+
+  // Update user with Stripe customer ID
+  await prisma.user.update({
+    where: { id: userId },
+    data: { stripeCustomerId: customer.id },
+  });
+
+  return customer.id;
+}
+
+// Function to handle subscription creation
+export async function createSubscription(userId: string, priceId: string) {
+  try {
+    const customerId = await createOrGetStripeCustomer(userId);
+
+    const subscription = await stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
+    }) as unknown as StripeSubscriptionWithPeriods & {
+      latest_invoice: StripeInvoiceWithPaymentIntent;
+    };
+
+    // Store subscription in database
+    await prisma.subscription.create({
+      data: {
+        userId,
+        stripeSubscriptionId: subscription.id,
+        status: subscription.status.toUpperCase() as 'ACTIVE' | 'CANCELED' | 'INCOMPLETE' | 'PAST_DUE' | 'TRIALING' | 'UNPAID',
+        planType: 'PREMIUM',
+        stripePriceId: priceId,
+        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      },
+    });
+
+    const latestInvoice = subscription.latest_invoice;
+    const paymentIntent = latestInvoice?.payment_intent;
+    return {
+      subscriptionId: subscription.id,
+      clientSecret: paymentIntent?.client_secret,
+    };
+  } catch (error) {
+    console.error('Error creating subscription:', error);
+    throw error;
   }
 }
