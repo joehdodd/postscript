@@ -154,6 +154,7 @@ export async function fetchUserSubscription() {
       subscription.stripeSubscriptionId,
       { expand: ['latest_invoice'] }
     ) as unknown as StripeSubscriptionWithPeriods;
+    console.log('Stripeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee Subscription:', stripeSubscription);
 
     return {
       id: subscription.stripeSubscriptionId,
@@ -327,5 +328,128 @@ export async function createSubscription(userId: string, priceId: string) {
   } catch (error) {
     console.error('Error creating subscription:', error);
     throw error;
+  }
+}
+
+// Subscription Management Functions
+
+export async function cancelSubscription() {
+  'use server';
+  
+  const { userId } = await requireAuth();
+  if (!userId) {
+    redirect('/');
+  }
+
+  try {
+    // Get user's active subscription
+    const subscription = await prisma.subscription.findFirst({
+      where: { 
+        userId,
+        status: 'ACTIVE'
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!subscription) {
+      return {
+        success: false,
+        error: 'No active subscription found'
+      };
+    }
+
+    // Cancel subscription in Stripe (at period end)
+    const stripeSubscription = await stripe.subscriptions.update(
+      subscription.stripeSubscriptionId,
+      {
+        cancel_at_period_end: true,
+      }
+    ) as unknown as StripeSubscriptionWithPeriods;
+
+    // Update subscription in database
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        cancelAtPeriodEnd: true,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Subscription will be canceled at the end of the current period',
+      data: {
+        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+        currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+      },
+    };
+
+  } catch (error) {
+    console.error('Error canceling subscription:', error);
+    return {
+      success: false,
+      error: 'Failed to cancel subscription'
+    };
+  }
+}
+
+export async function reactivateSubscription() {
+  'use server';
+  
+  const { userId } = await requireAuth();
+  if (!userId) {
+    redirect('/');
+  }
+
+  try {
+    // Get user's subscription that's set to cancel
+    const subscription = await prisma.subscription.findFirst({
+      where: { 
+        userId,
+        status: 'ACTIVE',
+        cancelAtPeriodEnd: true
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!subscription) {
+      return {
+        success: false,
+        error: 'No subscription found to reactivate'
+      };
+    }
+
+    // Reactivate subscription in Stripe
+    const stripeSubscription = await stripe.subscriptions.update(
+      subscription.stripeSubscriptionId,
+      {
+        cancel_at_period_end: false,
+      }
+    ) as unknown as StripeSubscriptionWithPeriods;
+
+    // Update subscription in database
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        cancelAtPeriodEnd: false,
+        updatedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Subscription reactivated successfully',
+      data: {
+        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+        currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+      },
+    };
+
+  } catch (error) {
+    console.error('Error reactivating subscription:', error);
+    return {
+      success: false,
+      error: 'Failed to reactivate subscription'
+    };
   }
 }
