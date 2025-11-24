@@ -9,6 +9,7 @@ export default function Navigation() {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/prompt', label: 'Your Prompts' },
+    { href: '/account', label: 'Account' },
   ];
 
   return (
@@ -16,8 +17,8 @@ export default function Navigation() {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
             _postscript
@@ -37,7 +38,9 @@ export default function Navigation() {
                       : 'text-ps-secondary hover:text-ps-primary'
                   }`}
                   style={{
-                    backgroundColor: isActive ? 'var(--ps-primary-100)' : 'transparent',
+                    backgroundColor: isActive
+                      ? 'var(--ps-primary-100)'
+                      : 'transparent',
                   }}
                 >
                   {item.label}

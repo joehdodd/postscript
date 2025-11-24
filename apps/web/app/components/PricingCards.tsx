@@ -12,6 +12,7 @@ type PricingPlan = {
 
 type PricingCardsProps = {
   isAuthenticated?: boolean;
+  currentPriceId?: string; // Stripe price ID of current subscription
 };
 
 const pricingPlans: PricingPlan[] = [
@@ -19,7 +20,7 @@ const pricingPlans: PricingPlan[] = [
     id: 'gold',
     name: 'Gold',
     price: '$2.50',
-    priceId: 'price_1SS2MWIwBSBptkFZZv87WG0B',
+    priceId: process.env.NODE_ENV === 'production' ? 'price_1SS2MWIwBSBptkFZZv87WG0B' : 'price_1SX6h8En4euahWDN0T51nrjM',
     features: [
       'Unlimited prompts',
     ],
@@ -28,7 +29,7 @@ const pricingPlans: PricingPlan[] = [
     id: 'platinum',
     name: 'Platinum',
     price: '$5.00',
-    priceId: 'price_1SSJBtIwBSBptkFZ8eZ2kNKk',
+    priceId: process.env.NODE_ENV === 'production' ? 'price_1SSJBtIwBSBptkFZ8eZ2kNKk' : 'price_1SX6gsEn4euahWDNNCthbwzZ',
     features: [
       'Unlimited prompts',
       'Analytics dashboard',
@@ -39,9 +40,15 @@ const pricingPlans: PricingPlan[] = [
 
 export default function PricingCards({
   isAuthenticated = false,
+  currentPriceId,
 }: PricingCardsProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const router = useRouter();
+
+  const isCurrentPlan = (plan: PricingPlan) => {
+    // Check if the user's current subscription price ID matches this plan's price ID
+    return currentPriceId === plan.priceId;
+  };
 
   const handleSubscribe = async (priceId: string, planId: string) => {
     if (!priceId) return;
@@ -125,63 +132,47 @@ export default function PricingCards({
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => handleSubscribe(plan.priceId, plan.id)}
-                  disabled={
-                    isLoading === plan.id ||
-                    (isAuthenticated && plan.id === 'free')
-                  }
-                  className={`w-full py-3 rounded-lg font-medium transition-all duration-200 ${plan.id === 'premium'
-                    ? 'text-white hover:opacity-90 hover:shadow-lg'
-                    : isAuthenticated
-                      ? 'bg-ps-neutral-100 text-ps-text-secondary cursor-not-allowed'
-                      : 'text-white hover:opacity-90 hover:shadow-lg'
-                    }`}
-                  style={{
-                    backgroundColor:
-                      plan.id === 'premium'
-                        ? 'var(--ps-primary-600)'
-                        : isAuthenticated
-                          ? undefined
-                          : 'var(--ps-secondary-600)',
-                  }}
-                >
-                  {isLoading === plan.id ? (
-                    <span className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : plan.id === 'gold' || plan.id === 'platinum' ? (
-                    isAuthenticated ? (
+                {isCurrentPlan(plan) ? (
+                  <div className="w-full py-3 rounded-lg font-medium text-center bg-ps-neutral-200 text-ps-text-secondary">
+                    Current Plan
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleSubscribe(plan.priceId, plan.id)}
+                    disabled={isLoading === plan.id}
+                    className="w-full py-3 rounded-lg font-medium transition-all duration-200 bg-ps-primary hover:bg-ps-primary-700 hover:shadow-lg disabled:opacity-50"
+                  >
+                    {isLoading === plan.id ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing...
+                      </span>
+                    ) : isAuthenticated ? (
                       'Upgrade Now'
                     ) : (
                       'Get Started'
-                    )
-                  ) : isAuthenticated ? (
-                    'Current Plan'
-                  ) : (
-                    'Get Started Free'
-                  )}
-                </button>
+                    )}
+                  </button>
+                )}
               </div>
             ))}
           </div>

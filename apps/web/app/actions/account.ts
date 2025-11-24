@@ -160,6 +160,7 @@ export async function fetchUserSubscription() {
       id: subscription.stripeSubscriptionId,
       status: stripeSubscription.status,
       planType: subscription.planType,
+      priceId: stripeSubscription.items.data[0]?.price?.id, // Get the actual price ID
       currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
       cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
       canceledAt: subscription.canceledAt,
