@@ -33,14 +33,9 @@ export default function Navigation() {
                   href={item.href}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? 'text-ps-primary'
-                      : 'text-ps-secondary hover:text-ps-primary'
+                      ? 'text-ps-primary bg-ps-primary/10 dark:bg-ps-primary/20'
+                      : 'text-ps-secondary hover:text-ps-primary hover:bg-ps-primary/5 dark:hover:bg-ps-primary/10'
                   }`}
-                  style={{
-                    backgroundColor: isActive
-                      ? 'var(--ps-primary-100)'
-                      : 'transparent',
-                  }}
                 >
                   {item.label}
                 </Link>
