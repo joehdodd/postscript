@@ -53,7 +53,7 @@ export async function sendMagicLink(
   try {
     const token = await generateMagicLinkToken(email);
     if (!token) {
-      return { success: false, error: 'User not found.' };
+      return { success: false, error: 'There was an issue generating the magic link.' };
     }
     const url = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://postscript.ink'}/prompt?token=${token}`;
     console.log('Generated magic link URL:', url);

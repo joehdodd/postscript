@@ -108,7 +108,6 @@ async function ensureSubscriptionCreated(
     const stripeSubscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     ) as unknown as StripeSubscriptionWithPeriods;
-
     // Check if subscription already exists in our database
     const existingSubscription = await prisma.subscription.findFirst({
       where: {
@@ -126,8 +125,8 @@ async function ensureSubscriptionCreated(
           status: stripeSubscription.status.toUpperCase() as 'ACTIVE' | 'CANCELED' | 'INCOMPLETE' | 'PAST_DUE' | 'TRIALING' | 'UNPAID',
           planType: 'PREMIUM' as 'FREE' | 'PREMIUM',
           stripePriceId: stripeSubscription.items.data[0]?.price.id || '',
-          currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+          currentPeriodStart: convertUnixTimestampToDate(stripeSubscription.current_period_start),
+          currentPeriodEnd: convertUnixTimestampToDate(stripeSubscription.current_period_end),
           cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false,
         },
       });
@@ -144,6 +143,25 @@ async function ensureSubscriptionCreated(
     // Don't throw - webhook will handle this
     return false;
   }
+}
+
+function convertUnixTimestampToDate(timestamp: number): Date {
+  // Validate that timestamp is a valid number
+  if (!timestamp || typeof timestamp !== 'number' || timestamp <= 0) {
+    console.error('Invalid Unix timestamp:', timestamp);
+    return new Date(); // Fallback to current date
+  }
+  
+  // Convert Unix timestamp (seconds) to JavaScript Date (milliseconds)
+  const date = new Date(timestamp * 1000);
+  
+  // Validate the resulting date
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date created from timestamp:', timestamp);
+    return new Date(); // Fallback to current date
+  }
+  
+  return date;
 }
 
 async function updateUserStripeCustomerId(userId: string, customerId: string): Promise<void> {

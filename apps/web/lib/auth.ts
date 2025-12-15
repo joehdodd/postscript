@@ -77,17 +77,22 @@ export async function validateTokenWithUser(token: string): Promise<{
     return { valid: false };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    });
 
-  if (!user) {
+    if (!user) {
+      return { valid: false };
+    }
+
+    return {
+      valid: true,
+      userId: payload.userId,
+      email: payload.email,
+    };
+  } catch (error) {
+    console.error('Database error during token validation:', error);
     return { valid: false };
   }
-
-  return {
-    valid: true,
-    userId: payload.userId,
-    email: payload.email,
-  };
 }
