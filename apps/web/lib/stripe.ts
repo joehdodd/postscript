@@ -30,7 +30,7 @@ export const getStripe = (): Promise<Stripe | null> => {
 
 // Server-side Stripe instance (for API routes)
 export const stripe = new StripeServer(getStripeSecretKey(), {
-  apiVersion: '2025-10-29.clover',
+  apiVersion: '2025-11-17.clover',
 });
 
 // Export helper function for environment variable
