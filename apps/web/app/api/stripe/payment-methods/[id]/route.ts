@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { getStripeSecretKey } from '../../../../../lib/stripe';
+import { stripe } from '../../../../../lib/stripe';
 import { requireAuth } from '../../../../actions/auth';
 import { prisma } from '@repo/prisma';
-
-const stripe = new Stripe(getStripeSecretKey(), {
-  apiVersion: '2025-10-29.clover',
-});
 
 export async function DELETE(
   request: NextRequest,

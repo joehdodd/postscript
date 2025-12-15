@@ -1,4 +1,5 @@
-import Stripe from 'stripe';
+import { stripe } from '../../lib/stripe';
+import type Stripe from 'stripe';
 import { prisma } from '@repo/prisma';
 
 // Extend Stripe types for proper property access
@@ -7,10 +8,6 @@ interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
   current_period_end: number;
   cancel_at_period_end: boolean;
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
 
 export interface BillingSuccessResult {
   success: boolean;

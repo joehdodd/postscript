@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { getStripeSecretKey } from '../../../../lib/stripe';
+import { stripe } from '../../../../lib/stripe';
 import { requireAuth } from '../../../actions/auth';
 import { createOrGetStripeCustomer } from '../../../actions/account';
-
-const stripe = new Stripe(getStripeSecretKey(), {
-  apiVersion: '2025-10-29.clover',
-});
 
 // POST /api/stripe/setup-intent - Create a new setup intent for adding payment methods
 export async function POST() {

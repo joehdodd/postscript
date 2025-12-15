@@ -3,7 +3,8 @@
 import { redirect } from 'next/navigation';
 import { requireAuth } from './auth';
 import { prisma } from '@repo/prisma';
-import Stripe from 'stripe';
+import { stripe } from '../../lib/stripe';
+import type Stripe from 'stripe';
 
 // Extend Stripe types for proper property access
 interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
@@ -17,10 +18,6 @@ interface StripeInvoiceWithPaymentIntent extends Stripe.Invoice {
     client_secret?: string;
   };
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
 
 // Note: You'll need to add these fields to your User model in Prisma schema
 type UpdateAccountData = {

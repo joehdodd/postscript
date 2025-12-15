@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { getStripeSecretKey } from '../../../../lib/stripe';
+import { stripe } from '../../../../lib/stripe';
+import type Stripe from 'stripe';
 import { prisma } from '@repo/prisma';
 
 // Extend Stripe types to include properties that exist in API but not in types
@@ -13,10 +13,6 @@ interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
   current_period_end: number;
   cancel_at_period_end: boolean;
 }
-
-const stripe = new Stripe(getStripeSecretKey(), {
-  apiVersion: '2025-10-29.clover',
-});
 
 function getWebhookSecret(): string {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
