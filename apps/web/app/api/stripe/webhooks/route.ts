@@ -146,7 +146,7 @@ async function handleSubscriptionUpdate(subscription: StripeSubscriptionWithPeri
     userId,
     stripeSubscriptionId: subscription.id,
     status: subscription.status.toUpperCase() as 'ACTIVE' | 'CANCELED' | 'INCOMPLETE' | 'PAST_DUE' | 'TRIALING' | 'UNPAID',
-    planType: 'PREMIUM' as 'FREE' | 'PREMIUM', // You can determine this from the price ID
+    planType: getPriceEnumFromPriceId(subscription.items.data[0]?.price.id || ''), // You can determine this from the price ID
     stripePriceId: subscription.items.data[0]?.price.id || '',
     currentPeriodStart: new Date(subscription.current_period_start * 1000),
     currentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -168,4 +168,15 @@ async function handleSubscriptionUpdate(subscription: StripeSubscriptionWithPeri
       data: subscriptionData,
     });
   }
+}
+
+function getPriceEnumFromPriceId(priceId: string): 'GOLD' | 'PLATINUM' {
+  const priceMap: { [key: string]: 'GOLD' | 'PLATINUM' } = {
+    price_1SS2MWIwBSBptkFZZv87WG0B: 'GOLD',
+    price_1SX6gsEn4euahWDNNCthbwzZ: 'GOLD',
+    price_1SSJBtIwBSBptkFZ8eZ2kNKk: 'PLATINUM',
+    price_1SX6h8En4euahWDN0T51nrjM: 'PLATINUM',
+  };
+
+  return priceMap[priceId] ?? 'GOLD';
 }

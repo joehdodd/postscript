@@ -9,7 +9,10 @@ type SubscriptionStatusProps = {
   onUpdate?: () => void;
 };
 
-export default function SubscriptionStatus({ subscription, onUpdate }: SubscriptionStatusProps) {
+export default function SubscriptionStatus({
+  subscription,
+  onUpdate,
+}: SubscriptionStatusProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -44,25 +47,25 @@ export default function SubscriptionStatus({ subscription, onUpdate }: Subscript
       default:
         return 'Unknown';
     }
-  }; 
+  };
 
   const getPlanDisplayName = (planType: string) => {
-    switch (planType) {
-      case 'pro':
-        return 'Pro Plan';
-      case 'premium':
-        return 'Premium Plan';
+    switch (planType.toLowerCase()) {
+      case 'gold':
+        return 'Gold Plan';
+      case 'platinum':
+        return 'Platinum Plan';
       default:
         return 'Subscription';
     }
   };
 
   const getPlanPrice = (planType: string) => {
-    switch (planType) {
-      case 'pro':
+    switch (planType.toLowerCase()) {
+      case 'gold':
         return '$19';
-      case 'premium':
-        return '$39';
+      case 'platinum':
+        return '$5';
       default:
         return '$0';
     }
@@ -103,17 +106,18 @@ export default function SubscriptionStatus({ subscription, onUpdate }: Subscript
                 {formatDate(subscription.currentPeriodEnd)}
               </span>
             </div>
-            
+
             {subscription.cancelAtPeriodEnd && (
               <div className="p-3 bg-ps-accent-50 rounded-lg">
                 <p className="text-sm text-ps-accent-700">
-                  Your subscription will not renew after {formatDate(subscription.currentPeriodEnd)}.
+                  Your subscription will not renew after{' '}
+                  {formatDate(subscription.currentPeriodEnd)}.
                 </p>
               </div>
             )}
           </div>
         </div>
-        <SubscriptionActions 
+        <SubscriptionActions
           subscription={subscription}
           onUpdate={onUpdate || (() => {})}
         />

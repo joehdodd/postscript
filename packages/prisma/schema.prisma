@@ -103,6 +103,6 @@ enum SubscriptionStatus {
 }
 
 enum PlanType {
-  FREE
-  PREMIUM
+  GOLD
+  PLATINUM
 }

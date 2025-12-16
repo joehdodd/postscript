@@ -3,10 +3,11 @@ import { stripe } from '../../lib/stripe';
 import { prisma } from '@repo/prisma';
 
 // Extend Stripe types for proper property access
-interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
+interface StripeSubscriptionWithPeriodsPlan extends Stripe.Subscription {
   current_period_start: number;
   current_period_end: number;
   cancel_at_period_end: boolean;
+  plan: Stripe.Price;
 }
 
 export interface BillingSuccessResult {
@@ -19,12 +20,12 @@ export interface BillingSuccessResult {
 
 export async function processBillingSuccess(
   sessionId: string,
-  userId: string
+  userId: string,
 ): Promise<BillingSuccessResult> {
   try {
     // Retrieve the session from Stripe to verify the payment
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items', 'line_items.data.price.product', 'subscription']
+      expand: ['line_items', 'line_items.data.price.product', 'subscription'],
     });
 
     // Verify payment was successful
@@ -34,15 +35,18 @@ export async function processBillingSuccess(
         planName: '',
         amount: '',
         subscriptionCreated: false,
-        error: 'Payment was not successful'
+        error: 'Payment was not successful',
       };
     }
 
     // Extract plan details from the session
     const planDetails = extractPlanDetails(session);
-    
+
     // Ensure subscription is created in our database (fallback if webhook hasn't fired yet)
-    const subscriptionCreated = await ensureSubscriptionCreated(session, userId);
+    const subscriptionCreated = await ensureSubscriptionCreated(
+      session,
+      userId,
+    );
 
     return {
       success: true,
@@ -50,7 +54,6 @@ export async function processBillingSuccess(
       amount: planDetails.amount,
       subscriptionCreated,
     };
-
   } catch (error) {
     console.error('Error processing billing success:', error);
     return {
@@ -58,10 +61,10 @@ export async function processBillingSuccess(
       planName: '',
       amount: '',
       subscriptionCreated: false,
-      error: 'Failed to process billing success'
+      error: 'Failed to process billing success',
     };
   }
-} 
+}
 
 function extractPlanDetails(session: Stripe.Checkout.Session): {
   planName: string;
@@ -73,15 +76,20 @@ function extractPlanDetails(session: Stripe.Checkout.Session): {
   if (session.line_items?.data[0]) {
     const lineItem = session.line_items.data[0];
     const price = lineItem.price;
-    
+
     if (price) {
       // Format the amount
       amount = `$${(price.unit_amount! / 100).toFixed(2)}`;
-      
+
       // Get plan name from price metadata or product name
       if (price.metadata?.plan_name) {
         planName = price.metadata.plan_name;
-      } else if (price.product && typeof price.product === 'object' && 'name' in price.product && price.product.name) {
+      } else if (
+        price.product &&
+        typeof price.product === 'object' &&
+        'name' in price.product &&
+        price.product.name
+      ) {
         planName = price.product.name;
       } else {
         // Fallback based on amount
@@ -95,16 +103,16 @@ function extractPlanDetails(session: Stripe.Checkout.Session): {
 
 async function ensureSubscriptionCreated(
   session: Stripe.Checkout.Session,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   if (!session.subscription) {
     return false;
   }
   const subscription = session.subscription as Stripe.Subscription;
   try {
-    const stripeSubscription = await stripe.subscriptions.retrieve(
-      subscription.id
-    ) as unknown as StripeSubscriptionWithPeriods;
+    const stripeSubscription = (await stripe.subscriptions.retrieve(
+      subscription.id,
+    )) as unknown as StripeSubscriptionWithPeriodsPlan;
     // Check if subscription already exists in our database
     const existingSubscription = await prisma.subscription.findFirst({
       where: {
@@ -117,19 +125,32 @@ async function ensureSubscriptionCreated(
       // Create subscription in our database
       const hasItems = stripeSubscription.items.data.length > 0;
       if (!hasItems) {
-        console.error('Stripe subscription has no items:', stripeSubscription.id);
+        console.error(
+          'Stripe subscription has no items:',
+          stripeSubscription.id,
+        );
         return false;
       }
       const startAndEnd = {
-        currentPeriodStart: convertUnixTimestampToDate(stripeSubscription?.items?.data[0]?.current_period_start ?? 0),
-        currentPeriodEnd: convertUnixTimestampToDate(stripeSubscription?.items?.data[0]?.current_period_end ?? 0),
+        currentPeriodStart: convertUnixTimestampToDate(
+          stripeSubscription?.items?.data[0]?.current_period_start ?? 0,
+        ),
+        currentPeriodEnd: convertUnixTimestampToDate(
+          stripeSubscription?.items?.data[0]?.current_period_end ?? 0,
+        ),
       };
       await prisma.subscription.create({
         data: {
           userId: userId,
           stripeSubscriptionId: stripeSubscription.id,
-          status: stripeSubscription.status.toUpperCase() as 'ACTIVE' | 'CANCELED' | 'INCOMPLETE' | 'PAST_DUE' | 'TRIALING' | 'UNPAID',
-          planType: 'PREMIUM' as 'FREE' | 'PREMIUM',
+          status: stripeSubscription.status.toUpperCase() as
+            | 'ACTIVE'
+            | 'CANCELED'
+            | 'INCOMPLETE'
+            | 'PAST_DUE'
+            | 'TRIALING'
+            | 'UNPAID',
+          planType: getPriceEnumFromPriceId(stripeSubscription.plan.id),
           stripePriceId: stripeSubscription.items.data[0]?.price.id || '',
           cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false,
           ...startAndEnd,
@@ -137,8 +158,11 @@ async function ensureSubscriptionCreated(
       });
 
       // Update user's Stripe customer ID if not set
-      await updateUserStripeCustomerId(userId, stripeSubscription.customer as string);
-      
+      await updateUserStripeCustomerId(
+        userId,
+        stripeSubscription.customer as string,
+      );
+
       return true;
     }
 
@@ -150,26 +174,40 @@ async function ensureSubscriptionCreated(
   }
 }
 
+function getPriceEnumFromPriceId(priceId: string): 'GOLD' | 'PLATINUM' {
+  const priceMap: { [key: string]: 'GOLD' | 'PLATINUM' } = {
+    price_1SS2MWIwBSBptkFZZv87WG0B: 'GOLD',
+    price_1SX6gsEn4euahWDNNCthbwzZ: 'GOLD',
+    price_1SSJBtIwBSBptkFZ8eZ2kNKk: 'PLATINUM',
+    price_1SX6h8En4euahWDN0T51nrjM: 'PLATINUM',
+  };
+
+  return priceMap[priceId] ?? 'GOLD';
+}
+
 function convertUnixTimestampToDate(timestamp: number): Date {
   // Validate that timestamp is a valid number
   if (!timestamp || typeof timestamp !== 'number' || timestamp <= 0) {
     console.error('Invalid Unix timestamp:', timestamp);
     return new Date(); // Fallback to current date
   }
-  
+
   // Convert Unix timestamp (seconds) to JavaScript Date (milliseconds)
   const date = new Date(timestamp * 1000);
-  
+
   // Validate the resulting date
   if (isNaN(date.getTime())) {
     console.error('Invalid date created from timestamp:', timestamp);
     return new Date(); // Fallback to current date
   }
-  
+
   return date;
 }
 
-async function updateUserStripeCustomerId(userId: string, customerId: string): Promise<void> {
+async function updateUserStripeCustomerId(
+  userId: string,
+  customerId: string,
+): Promise<void> {
   if (!customerId) return;
 
   try {

@@ -55,8 +55,6 @@ export default function AccountPage() {
         fetchUserInvoices(),
       ]);
 
-      console.log('subscriptionResult:', subscriptionResult);
-
       setUserData(userDataResult);
       setSubscription(subscriptionResult);
       setPaymentMethods(paymentMethodsResult);
