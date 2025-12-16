@@ -1,5 +1,5 @@
+import Stripe from 'stripe';
 import { stripe } from '../../lib/stripe';
-import type Stripe from 'stripe';
 import { prisma } from '@repo/prisma';
 
 // Extend Stripe types for proper property access
@@ -61,7 +61,7 @@ export async function processBillingSuccess(
       error: 'Failed to process billing success'
     };
   }
-}
+} 
 
 function extractPlanDetails(session: Stripe.Checkout.Session): {
   planName: string;
@@ -100,10 +100,10 @@ async function ensureSubscriptionCreated(
   if (!session.subscription) {
     return false;
   }
-
+  const subscription = session.subscription as Stripe.Subscription;
   try {
     const stripeSubscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
+      subscription.id
     ) as unknown as StripeSubscriptionWithPeriods;
     // Check if subscription already exists in our database
     const existingSubscription = await prisma.subscription.findFirst({
@@ -115,6 +115,15 @@ async function ensureSubscriptionCreated(
 
     if (!existingSubscription) {
       // Create subscription in our database
+      const hasItems = stripeSubscription.items.data.length > 0;
+      if (!hasItems) {
+        console.error('Stripe subscription has no items:', stripeSubscription.id);
+        return false;
+      }
+      const startAndEnd = {
+        currentPeriodStart: convertUnixTimestampToDate(stripeSubscription?.items?.data[0]?.current_period_start ?? 0),
+        currentPeriodEnd: convertUnixTimestampToDate(stripeSubscription?.items?.data[0]?.current_period_end ?? 0),
+      };
       await prisma.subscription.create({
         data: {
           userId: userId,
@@ -122,9 +131,8 @@ async function ensureSubscriptionCreated(
           status: stripeSubscription.status.toUpperCase() as 'ACTIVE' | 'CANCELED' | 'INCOMPLETE' | 'PAST_DUE' | 'TRIALING' | 'UNPAID',
           planType: 'PREMIUM' as 'FREE' | 'PREMIUM',
           stripePriceId: stripeSubscription.items.data[0]?.price.id || '',
-          currentPeriodStart: convertUnixTimestampToDate(stripeSubscription.current_period_start),
-          currentPeriodEnd: convertUnixTimestampToDate(stripeSubscription.current_period_end),
           cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false,
+          ...startAndEnd,
         },
       });
 

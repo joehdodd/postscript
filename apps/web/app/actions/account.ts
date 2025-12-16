@@ -1,10 +1,9 @@
 'use server';
-
 import { redirect } from 'next/navigation';
 import { requireAuth } from './auth';
 import { prisma } from '@repo/prisma';
 import { stripe } from '../../lib/stripe';
-import type Stripe from 'stripe';
+import Stripe from 'stripe';
 
 // Extend Stripe types for proper property access
 interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
@@ -147,11 +146,11 @@ export async function fetchUserSubscription() {
     }
 
     // Get fresh data from Stripe
+    // 1129 HAVING ISSUES HERE!!!!!!!!! Check type casting, etc
     const stripeSubscription = await stripe.subscriptions.retrieve(
       subscription.stripeSubscriptionId,
       { expand: ['latest_invoice'] }
     ) as unknown as StripeSubscriptionWithPeriods;
-    console.log('Stripeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee Subscription:', stripeSubscription);
 
     return {
       id: subscription.stripeSubscriptionId,

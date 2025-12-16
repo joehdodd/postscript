@@ -20,7 +20,7 @@ const pricingPlans: PricingPlan[] = [
     id: 'gold',
     name: 'Gold',
     price: '$2.50',
-    priceId: process.env.NODE_ENV === 'production' ? 'price_1SS2MWIwBSBptkFZZv87WG0B' : 'price_1SX6h8En4euahWDN0T51nrjM',
+    priceId: process.env.NODE_ENV === 'production' ? 'price_1SS2MWIwBSBptkFZZv87WG0B' : 'price_1SX6gsEn4euahWDNNCthbwzZ',
     features: [
       'Unlimited prompts',
     ],
@@ -29,7 +29,7 @@ const pricingPlans: PricingPlan[] = [
     id: 'platinum',
     name: 'Platinum',
     price: '$5.00',
-    priceId: process.env.NODE_ENV === 'production' ? 'price_1SSJBtIwBSBptkFZ8eZ2kNKk' : 'price_1SX6gsEn4euahWDNNCthbwzZ',
+    priceId: process.env.NODE_ENV === 'production' ? 'price_1SSJBtIwBSBptkFZ8eZ2kNKk' : 'price_1SX6h8En4euahWDN0T51nrjM',
     features: [
       'Unlimited prompts',
       'Analytics dashboard',

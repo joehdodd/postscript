@@ -72,6 +72,8 @@ export default function SubscriptionStatus({ subscription, onUpdate }: Subscript
     return <FreePlanCard />;
   }
 
+  console.log('Rendering SubscriptionStatus with subscription:', subscription);
+
   return (
     <div className="bg-ps-secondary rounded-lg p-6 shadow-sm">
       <h2 className="text-xl font-semibold text-ps-primary mb-4">
