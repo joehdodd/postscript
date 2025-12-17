@@ -23,7 +23,7 @@ export default function PromptContent({ content }: PromptContentProps) {
           The Prompt
         </h2>
       </div>
-      <div className="bg-ps-neutral-50 p-6 rounded-lg border-l-4 border-l-ps-primary-500">
+      <div className="bg-ps-neutral-50 p-2 rounded-lg border-l-4 border-l-ps-primary-500">
         <p className="text-xl text-ps-primary italic leading-relaxed">
           &ldquo;{content}&rdquo;
         </p>

@@ -9,11 +9,11 @@ export default async function Prompt({ promptId }: { promptId: string }) {
   
   return (
     <div className="mb-6">
-      <p className="text-lg text-slate-700 italic">
+      <p className="text-lg text-ps-primary italic">
         &ldquo;{prompt.content}&rdquo;
       </p>
       {prompt.sentAt && (
-        <p className="text-sm text-slate-400 mt-2">
+        <p className="text-sm text-ps-primary mt-2">
           Sent {new Date(prompt.sentAt).toLocaleDateString()}
         </p>
       )}

@@ -47,15 +47,15 @@ export default async function Entry({ params }: EntryPageProps) {
 
   return (
     <Card className="w-full">
-      <h2 className="text-xl text-slate-600 font-bold mb-4">
+      <h2 className="text-xl text-ps-primary font-bold mb-4">
         {prompt.isOpen ? 'New Entry' : 'Your Entry'}
       </h2>
       <Prompt promptId={prompt.id} />
       {prompt.isOpen ? (
         <EntryForm userId={userId} promptId={prompt.id} />
       ) : (
-        <div className="mt-4 p-4 bg-slate-50 rounded-md">
-          <p className="text-slate-700">
+        <div className="mt-4 p-4 rounded-md">
+          <p className="text-ps-primary leading-relaxed">
             {existingEntry ? existingEntry.content : '...'}
           </p>
         </div>

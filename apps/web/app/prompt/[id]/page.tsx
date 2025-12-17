@@ -34,7 +34,8 @@ export default async function PromptDetail({ params }: PromptPageProps) {
           <div className="bg-ps-secondary rounded-lg border-ps p-8 mb-6 border shadow-md">
             <PromptHeader prompt={prompt} />
             <PromptContent content={prompt.content} />
-            <PromptResponse 
+            <hr className="my-6 border-ps-border" />
+            <PromptResponse
               promptId={id}
               isOpen={prompt.isOpen}
               existingEntry={existingEntry}

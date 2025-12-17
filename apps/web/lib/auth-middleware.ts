@@ -39,6 +39,7 @@ export async function validateTokenForMiddleware(
     
     return payload;
   } catch (error) {
+    console.error('Error validating token in middleware:', error);
     // Don't log detailed errors in middleware for security
     return null;
   }
