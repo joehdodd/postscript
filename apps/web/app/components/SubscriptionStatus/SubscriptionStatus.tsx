@@ -22,15 +22,16 @@ export default function SubscriptionStatus({
   };
 
   const getStatusColor = (status: string) => {
+    console.log('Subscription status:', status);
     switch (status) {
       case 'active':
-        return 'bg-ps-secondary-500 text-white';
+        return 'bg-ps-secondary-500 text-green-600';
       case 'canceled':
-        return 'bg-ps-neutral-400 text-white';
+        return 'bg-ps-neutral-400 text-orange-600';
       case 'past_due':
-        return 'bg-ps-accent-500 text-white';
+        return 'bg-ps-accent-500 text-red-600';
       default:
-        return 'bg-ps-neutral-400 text-white';
+        return 'bg-ps-neutral-400 text-gray-600';
     }
   };
 
@@ -74,8 +75,6 @@ export default function SubscriptionStatus({
   if (!subscription) {
     return <FreePlanCard />;
   }
-
-  console.log('Rendering SubscriptionStatus with subscription:', subscription);
 
   return (
     <div className="bg-ps-secondary rounded-lg p-6 shadow-sm">

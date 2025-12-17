@@ -95,7 +95,7 @@ export default function AccountPage() {
               Manage your account information, subscription, and billing details
             </p>
           </div>
-          <AccountNavigation />
+          {/* <AccountNavigation /> */}
           <div className="grid lg:grid-cols-3 gap-8 mt-8">
             <div className="lg:col-span-2 space-y-8">
               <AccountInformation

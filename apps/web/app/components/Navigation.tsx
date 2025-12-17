@@ -17,7 +17,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link
-            href="/"
+            href="/prompt"
             className="text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
             _postscript
