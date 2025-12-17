@@ -1,4 +1,5 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js';
+import StripeServer from 'stripe';
 
 // Environment variable validation following our guidelines pattern
 function getStripePublishableKey(): string {
@@ -28,4 +29,9 @@ export const getStripe = (): Promise<Stripe | null> => {
 };
 
 // Server-side Stripe instance (for API routes)
+export const stripe = new StripeServer(getStripeSecretKey(), {
+  apiVersion: '2025-11-17.clover',
+});
+
+// Export helper function for environment variable
 export { getStripeSecretKey };

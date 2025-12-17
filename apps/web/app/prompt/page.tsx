@@ -122,7 +122,7 @@ export default async function Prompt() {
                   You&apos;ll receive your first thoughtful prompt soon. Check
                   your email for daily inspiration.
                 </p>
-                <Link
+                {/* <Link
                   href="/"
                   className="inline-block px-6 py-3 text-white font-medium rounded-lg transition-all duration-200"
                   style={{
@@ -131,7 +131,7 @@ export default async function Prompt() {
                   }}
                 >
                   Back to Home
-                </Link>
+                </Link> */}
               </div>
             )}
           </div>

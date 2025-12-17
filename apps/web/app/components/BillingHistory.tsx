@@ -32,13 +32,13 @@ export default function BillingHistory({ invoices = [] }: BillingHistoryProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'bg-ps-secondary-500 text-white';
+        return 'text-green-600';
       case 'pending':
-        return 'bg-ps-accent-500 text-white';
+        return 'text-orange-600';
       case 'failed':
-        return 'bg-red-500 text-white';
+        return 'text-red-600';
       default:
-        return 'bg-ps-neutral-400 text-white';
+        return 'text-gray-600';
     }
   };
 

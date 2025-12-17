@@ -7,8 +7,8 @@ export default function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: '/', label: 'Home' },
     { href: '/prompt', label: 'Your Prompts' },
+    { href: '/account', label: 'Account' },
   ];
 
   return (
@@ -16,8 +16,8 @@ export default function Navigation() {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/prompt"
             className="text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
             _postscript
@@ -33,12 +33,9 @@ export default function Navigation() {
                   href={item.href}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? 'text-ps-primary'
-                      : 'text-ps-secondary hover:text-ps-primary'
+                      ? 'text-ps-primary bg-ps-primary/10 dark:bg-ps-primary/20'
+                      : 'text-ps-secondary hover:text-ps-primary hover:bg-ps-primary/5 dark:hover:bg-ps-primary/10'
                   }`}
-                  style={{
-                    backgroundColor: isActive ? 'var(--ps-primary-100)' : 'transparent',
-                  }}
                 >
                   {item.label}
                 </Link>

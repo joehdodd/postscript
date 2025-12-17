@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation';
 import { fetchPrompt } from '../../actions/prompt';
 import { fetchEntryByPromptAndUser } from '../../actions/entry';
 import { requireAuth } from '../../actions/auth';
-import PromptHeader from '../../components/PromptHeader';
-import PromptContent from '../../components/PromptContent';
-import PromptResponse from '../../components/PromptResponse';
-import PromptActions from '../../components/PromptActions';
+import PromptHeader from '../../components/Prompt/PromptHeader';
+import PromptContent from '../../components/Prompt/PromptContent';
+import PromptResponse from '../../components/Prompt/PromptResponse';
+import PromptActions from '../../components/Prompt/PromptActions';
 
 type PromptPageProps = {
   params: Promise<{ id: string }>;

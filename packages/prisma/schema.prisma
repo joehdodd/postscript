@@ -11,11 +11,59 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  frequency String // e.g., 'daily', 'weekly'
-  prompts   Prompt[]
-  entries   Entry[]
+  id               String         @id @default(uuid())
+  email            String         @unique
+  firstName        String?
+  lastName         String?
+  phone            String?
+  
+  // Billing Address (for tax calculation only)
+  addressLine1     String?
+  addressLine2     String?
+  addressCity      String?
+  addressState     String?
+  addressPostalCode String?
+  addressCountry   String?        @default("US")
+  
+  // Stripe Integration - ONLY references, never payment data
+  stripeCustomerId String?        @unique
+  
+  frequency        String         // e.g., 'daily', 'weekly'
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  prompts          Prompt[]
+  entries          Entry[]
+  subscriptions    Subscription[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Stripe references - never store actual payment data
+  stripeSubscriptionId String             @unique
+  status               SubscriptionStatus
+  planType             PlanType
+  
+  // Subscription timing
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  
+  // Pricing reference (Stripe Price ID)
+  stripePriceId        String
+  
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  
+  @@index([userId])
+  @@index([stripeSubscriptionId])
+  @@map("subscriptions")
 }
 
 model Prompt {
@@ -23,11 +71,13 @@ model Prompt {
   content   String
   createdAt DateTime  @default(now())
   sentAt    DateTime?
-  frequency String // e.g., 'daily', 'weekly'
+  frequency String    // e.g., 'daily', 'weekly'
   userId    String
   user      User      @relation(fields: [userId], references: [id])
   entries   Entry[]
   isOpen    Boolean   @default(true)
+
+  @@map("prompts")
 }
 
 model Entry {
@@ -38,4 +88,21 @@ model Entry {
   promptId  String
   user      User     @relation(fields: [userId], references: [id])
   prompt    Prompt   @relation(fields: [promptId], references: [id])
+
+  @@map("entries")
+}
+
+// Enums for subscription management
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  PAST_DUE
+  TRIALING
+  UNPAID
+}
+
+enum PlanType {
+  GOLD
+  PLATINUM
 }
