@@ -323,61 +323,61 @@ export async function createOrGetStripeCustomer(userId: string) {
 }
 
 // Function to handle subscription creation
-export async function createSubscription(userId: string, priceId: string) {
-  try {
-    const customerId = await createOrGetStripeCustomer(userId);
+// export async function createSubscription(userId: string, priceId: string) {
+//   try {
+//     const customerId = await createOrGetStripeCustomer(userId);
 
-    const subscription = (await stripe.subscriptions.create({
-      customer: customerId,
-      items: [{ price: priceId }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
-    })) as unknown as StripeSubscriptionWithPeriods & {
-      latest_invoice: StripeInvoiceWithPaymentIntent;
-    };
+//     const subscription = (await stripe.subscriptions.create({
+//       customer: customerId,
+//       items: [{ price: priceId }],
+//       payment_behavior: 'default_incomplete',
+//       payment_settings: { save_default_payment_method: 'on_subscription' },
+//       expand: ['latest_invoice.payment_intent'],
+//     })) as unknown as StripeSubscriptionWithPeriods & {
+//       latest_invoice: StripeInvoiceWithPaymentIntent;
+//     };
 
-    // Store subscription in database
-    await prisma.subscription.create({
-      data: {
-        userId,
-        stripeSubscriptionId: subscription.id,
-        status: subscription.status.toUpperCase() as
-          | 'ACTIVE'
-          | 'CANCELED'
-          | 'INCOMPLETE'
-          | 'PAST_DUE'
-          | 'TRIALING'
-          | 'UNPAID',
-        planType: getPriceEnumFromPriceId(priceId),
-        stripePriceId: priceId,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      },
-    });
+//     // Store subscription in database
+//     await prisma.subscription.create({
+//       data: {
+//         userId,
+//         stripeSubscriptionId: subscription.id,
+//         status: subscription.status.toUpperCase() as
+//           | 'ACTIVE'
+//           | 'CANCELED'
+//           | 'INCOMPLETE'
+//           | 'PAST_DUE'
+//           | 'TRIALING'
+//           | 'UNPAID',
+//         planType: getPriceEnumFromPriceId(priceId),
+//         stripePriceId: priceId,
+//         currentPeriodStart: new Date(subscription.current_period_start * 1000),
+//         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+//       },
+//     });
 
-    const latestInvoice = subscription.latest_invoice;
-    const paymentIntent = latestInvoice?.payment_intent;
-    return {
-      subscriptionId: subscription.id,
-      clientSecret: paymentIntent?.client_secret,
-    };
-  } catch (error) {
-    console.error('Error creating subscription:', error);
-    throw error;
-  }
-}
+//     const latestInvoice = subscription.latest_invoice;
+//     const paymentIntent = latestInvoice?.payment_intent;
+//     return {
+//       subscriptionId: subscription.id,
+//       clientSecret: paymentIntent?.client_secret,
+//     };
+//   } catch (error) {
+//     console.error('Error creating subscription:', error);
+//     throw error;
+//   }
+// }
 
-function getPriceEnumFromPriceId(priceId: string): 'GOLD' | 'PLATINUM' {
-  const priceMap: { [key: string]: 'GOLD' | 'PLATINUM' } = {
-    price_1SS2MWIwBSBptkFZZv87WG0B: 'GOLD',
-    price_1SX6gsEn4euahWDNNCthbwzZ: 'GOLD',
-    price_1SSJBtIwBSBptkFZ8eZ2kNKk: 'PLATINUM',
-    price_1SX6h8En4euahWDN0T51nrjM: 'PLATINUM',
-  };
+// function getPriceEnumFromPriceId(priceId: string): 'GOLD' | 'PLATINUM' {
+//   const priceMap: { [key: string]: 'GOLD' | 'PLATINUM' } = {
+//     price_1SS2MWIwBSBptkFZZv87WG0B: 'GOLD',
+//     price_1SX6gsEn4euahWDNNCthbwzZ: 'GOLD',
+//     price_1SSJBtIwBSBptkFZ8eZ2kNKk: 'PLATINUM',
+//     price_1SX6h8En4euahWDN0T51nrjM: 'PLATINUM',
+//   };
 
-  return priceMap[priceId] ?? 'GOLD';
-}
+//   return priceMap[priceId] ?? 'GOLD';
+// }
 
 // Subscription Management Functions
 
