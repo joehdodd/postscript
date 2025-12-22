@@ -12,11 +12,11 @@ interface StripeSubscriptionWithPeriods extends Stripe.Subscription {
   cancel_at_period_end: boolean;
 }
 
-interface StripeInvoiceWithPaymentIntent extends Stripe.Invoice {
-  payment_intent?: {
-    client_secret?: string;
-  };
-}
+// interface StripeInvoiceWithPaymentIntent extends Stripe.Invoice {
+//   payment_intent?: {
+//     client_secret?: string;
+//   };
+// }
 
 // Note: You'll need to add these fields to your User model in Prisma schema
 type UpdateAccountData = {
