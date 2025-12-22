@@ -7,6 +7,7 @@ export default function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
+    { href: '/', label: 'Dashboard' },
     { href: '/prompt', label: 'Your Prompts' },
     { href: '/account', label: 'Account' },
   ];
@@ -17,7 +18,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link
-            href="/prompt"
+            href="/"
             className="text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
             _postscript
