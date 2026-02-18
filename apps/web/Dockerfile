@@ -40,6 +40,10 @@ FROM base
 
 ENV NODE_ENV="production"
 
+# Add non-root user for security
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
 # Install runtime dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y openssl && \
@@ -48,10 +52,13 @@ RUN apt-get update -qq && \
 WORKDIR /app
 
 # Copy built Next.js application
-COPY --from=build /app/apps/web/.next/standalone ./
-COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=build /app/apps/web/public ./apps/web/public
-COPY --from=build /app/packages/prisma ./packages/prisma
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+COPY --from=build --chown=nextjs:nodejs /app/packages/prisma ./packages/prisma
+
+# Switch to non-root user
+USER nextjs
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \

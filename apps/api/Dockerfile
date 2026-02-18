@@ -38,16 +38,23 @@ RUN npm run build
 # Production stage
 FROM base
 
+# Add non-root user for security
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
 # Install runtime dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y openssl && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy built application
-COPY --from=build /app/apps/api/dist ./dist
-COPY --from=build /app/apps/api/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages/prisma ./packages/prisma
+COPY --from=build --chown=nestjs:nodejs /app/apps/api/dist ./dist
+COPY --from=build --chown=nestjs:nodejs /app/apps/api/package.json ./package.json
+COPY --from=build --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=build --chown=nestjs:nodejs /app/packages/prisma ./packages/prisma
+
+# Switch to non-root user
+USER nestjs
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

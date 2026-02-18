@@ -4,6 +4,37 @@ import { validateTokenForMiddleware } from './lib/auth-middleware';
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // API route protection - handle API routes first
+  if (pathname.startsWith('/api/')) {
+    // Skip webhook endpoints (they use signature verification)
+    if (pathname.startsWith('/api/stripe/webhooks')) {
+      return NextResponse.next();
+    }
+    
+    // Require authentication for all other API routes
+    const token = request.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    
+    const user = await validateTokenForMiddleware(token);
+    if (!user) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+    
+    // Add user info to request headers for API routes
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', user.userId);
+    requestHeaders.set('x-user-email', user.email);
+    
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  // Page route authentication (existing logic)
   if (
     pathname === '/' ||
     pathname === '/login' ||
@@ -77,6 +108,9 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|installHook.js.map).*)',
+    // Match all request paths except static files and Next.js internals
+    '/((?!_next/static|_next/image|favicon.ico|installHook.js.map).*)',
+    // Include API routes for authentication
+    '/api/(.*)',
   ],
 };

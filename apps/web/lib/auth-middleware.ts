@@ -1,6 +1,5 @@
 // Lightweight JWT validation for Edge Runtime (middleware)
 // This module cannot import Prisma or other Node.js APIs
-import { prisma } from '@repo/prisma';
 import jwt from 'jsonwebtoken';
 
 interface TokenPayload {
@@ -27,19 +26,11 @@ export async function validateTokenForMiddleware(
     if (!payload.userId || !payload.email) {
       return null;
     }
-
-    const userExists = prisma.user.findUnique({
-      where: { id: payload.userId, email: payload.email },
-      select: { id: true },
-    });
-
-    if (!userExists) {
-      return null;
-    }
     
+    // Note: Cannot validate against database in Edge Runtime
+    // Full validation must happen in API routes using Node.js runtime
     return payload;
   } catch (error) {
-    console.error('Error validating token in middleware:', error);
     // Don't log detailed errors in middleware for security
     return null;
   }

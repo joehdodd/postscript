@@ -1,6 +1,22 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Headers, UnauthorizedException } from '@nestjs/common';
 import { EmailService } from './email.service';
 
+// Simple API key guard for internal service communication
+class ApiKeyGuard {
+  canActivate(context: any): boolean {
+    const request = context.switchToHttp().getRequest();
+    const apiKey = request.headers['authorization']?.replace('Bearer ', '');
+    const expectedKey = process.env.API_KEY_SECRET;
+    
+    if (!expectedKey) {
+      throw new Error('API_KEY_SECRET not configured');
+    }
+    
+    return apiKey === expectedKey;
+  }
+}
+
+@UseGuards(ApiKeyGuard)
 @Controller('email')
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
@@ -8,15 +24,20 @@ export class EmailController {
   @Post('send-prompt')
   @HttpCode(HttpStatus.OK)
   async sendPrompt(
-    @Body() body: { email: string; prompt?: string },
+    @Body() body: { email: string; prompt?: string; userId?: string },
+    @Headers('authorization') auth: string,
   ) {
-    const { email, prompt } = body;
+    const { email, prompt, userId } = body;
 
+    // Validate required fields
     if (!email) {
-      return {
-        success: false,
-        error: 'Email is required',
-      };
+      throw new UnauthorizedException('Email is required');
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new UnauthorizedException('Valid email is required');
     }
 
     try {

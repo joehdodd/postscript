@@ -29,22 +29,70 @@ export async function ensureDatabaseConnection(): Promise<void> {
     dbHealthChecked = true;
     dbHealthy = false;
     
-    console.error('❌ Database connection failed:', error);
-    
-    // Check for specific Supabase/Postgres paused database errors
+    // Get error details
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorCode = (error as any)?.code;
     
-    if (errorMessage.includes('database is paused') || 
-        errorMessage.includes('connection refused') ||
-        errorMessage.includes('P1001')) {
-      throw new Error(
-        'Database is paused or unavailable. Please unpause your Supabase database and restart the application.'
-      );
+    console.error('❌ Database connection failed');
+    console.error('   Raw error:', errorMessage);
+    if (errorCode) console.error('   Error code:', errorCode);
+    
+    // Detect specific error conditions and provide targeted guidance
+    let specificError = 'Database connection failed';
+    let solution = '';
+    
+    if (errorMessage.includes('Tenant or user not found')) {
+      specificError = '🚫 SUPABASE DATABASE PAUSED';
+      solution = `Your Supabase database appears to be paused (free tier auto-pauses after 7 days of inactivity).
+
+🔧 SOLUTION:
+   1. Go to https://supabase.com/dashboard
+   2. Find your project
+   3. Click "Resume" or "Unpause" button
+   4. Wait 2-3 minutes for database to start
+   5. Restart your development server
+
+⏱️  Note: Free tier databases pause automatically after 7 days of inactivity.`;
+    } else if (errorMessage.includes('Connection refused') || errorMessage.includes('ECONNREFUSED')) {
+      specificError = '🔌 DATABASE SERVER UNREACHABLE';
+      solution = `Cannot connect to the database server.
+
+🔧 SOLUTIONS:
+   1. If using Supabase: Check if project is paused in dashboard
+   2. If using local database: Ensure PostgreSQL is running
+   3. Check your DATABASE_URL in .env file
+   4. Verify network connectivity`;
+    } else if (errorMessage.includes('password authentication failed') || errorMessage.includes('P1001')) {
+      specificError = '🔐 AUTHENTICATION FAILED';
+      solution = `Database credentials are incorrect.
+
+🔧 SOLUTIONS:
+   1. Check DATABASE_URL in .env file
+   2. Verify username and password are correct
+   3. If using Supabase: Get fresh connection string from dashboard
+   4. Ensure connection string format is correct`;
+    } else if (errorMessage.includes('database') && errorMessage.includes('does not exist')) {
+      specificError = '📁 DATABASE NOT FOUND';
+      solution = `The specified database does not exist.
+
+🔧 SOLUTIONS:
+   1. Check database name in DATABASE_URL
+   2. Run database migrations: npm run db:push
+   3. If using Supabase: verify project is set up correctly`;
+    } else {
+      specificError = '❌ UNKNOWN DATABASE ERROR';
+      solution = `An unexpected database error occurred.
+
+🔧 GENERAL SOLUTIONS:
+   1. Check if Supabase project is paused
+   2. Verify DATABASE_URL in .env
+   3. Test database connection manually
+   4. Check Supabase dashboard for status updates
+
+Error details: ${errorMessage}`;
     }
     
-    throw new Error(
-      `Database connection failed: ${errorMessage}. Please check your database configuration.`
-    );
+    throw new Error(`${specificError}\n\n${solution}`);
   }
 }
 

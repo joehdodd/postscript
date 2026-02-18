@@ -6,11 +6,11 @@
   "author": "",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "test:e2e": "turbo run test:e2e",
-    "lint": "turbo run lint",
+    "dev": "npx turbo run dev",
+    "build": "npx turbo run build",
+    "test": "npx turbo run test",
+    "test:e2e": "npx turbo run test:e2e",
+    "lint": "npx turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {

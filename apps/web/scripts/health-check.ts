@@ -14,11 +14,13 @@ async function startupHealthCheck() {
     process.exit(0);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: { message: string } | any) {
-    console.error('❌ Database health check failed:', error.message);
-    console.error('\n💡 To fix this issue:');
-    console.error('  1. Check if your Supabase database is paused');
-    console.error('  2. Verify your DATABASE_URL in .env');
-    console.error('  3. Ensure your database is accessible\n');
+    console.log('\n' + '='.repeat(80));
+    console.error('🚨 APPLICATION STARTUP FAILED');
+    console.log('='.repeat(80));
+    console.error('\n' + error.message + '\n');
+    console.log('='.repeat(80));
+    console.log('Need help? Check the Supabase dashboard: https://supabase.com/dashboard');
+    console.log('='.repeat(80) + '\n');
     process.exit(1);
   }
 }
