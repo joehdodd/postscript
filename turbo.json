@@ -15,7 +15,8 @@
     "PORT",
     "WEB_APP_URL",
     "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET"
+    "STRIPE_WEBHOOK_SECRET",
+    "UPSTASH_REDITS_REST_URL",
   ],
   "tasks": {
     "dev": {

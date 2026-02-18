@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTokenForMiddleware } from './lib/auth-middleware';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+//import { Ratelimit } from '@upstash/ratelimit';
+//import { Redis } from '@upstash/redis';
 
 // Rate limiting configuration
-const ratelimit = process.env.UPSTASH_REDIS_REST_URL ? new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '1 m'), // 10 requests per minute per IP
-}) : null;
+//const ratelimit = process.env.UPSTASH_REDIS_REST_URL ? new Ratelimit({
+//  redis: Redis.fromEnv(),
+//  limiter: Ratelimit.slidingWindow(10, '1 m'), // 10 requests per minute per IP
+//}) : null;
 
 // Audit logging function
 function auditLog(request: NextRequest, userId?: string, action?: string) {
@@ -16,7 +16,7 @@ function auditLog(request: NextRequest, userId?: string, action?: string) {
   const userAgent = request.headers.get('user-agent') ?? 'unknown';
   const method = request.method;
   const url = request.url;
-  
+
   console.log(`[AUDIT] ${timestamp} - ${method} ${url} - User: ${userId || 'anonymous'} - IP: ${ip} - UA: ${userAgent} - Action: ${action || 'request'}`);
 }
 
@@ -30,47 +30,41 @@ export async function proxy(request: NextRequest) {
       auditLog(request, undefined, 'webhook-access');
       return NextResponse.next();
     }
-    
     // Rate limiting for API routes
-    if (ratelimit) {
-      try {
-        const { success, limit, reset, remaining } = await ratelimit.limit(
-          request.headers.get('x-forwarded-for') ?? request.headers.get('x-real-ip') ?? 'anonymous'
-        );
+    // if (ratelimit) {
+    //   try {
+    //     const { success, limit, reset, remaining } = await ratelimit.limit(
+    //       request.headers.get('x-forwarded-for') ?? request.headers.get('x-real-ip') ?? 'anonymous'
+    //     );
 
-        if (!success) {
-          auditLog(request, undefined, 'rate-limit-exceeded');
-          return NextResponse.json(
-            { error: 'Rate limit exceeded', limit, reset, remaining },
-            { status: 429 }
-          );
-        }
-      } catch (error) {
-        console.error('Rate limiting error:', error);
-        // Continue without rate limiting if Redis is down
-      }
-    }
-    
+    //     if (!success) {
+    //       auditLog(request, undefined, 'rate-limit-exceeded');
+    //       return NextResponse.json(
+    //         { error: 'Rate limit exceeded', limit, reset, remaining },
+    //         { status: 429 }
+    //       );
+    //     }
+    //   } catch (error) {
+    //     console.error('Rate limiting error:', error);
+    //     // Continue without rate limiting if Redis is down
+    //   }
+    // }
     // Require authentication for all other API routes
     const token = request.cookies.get('token')?.value;
     if (!token) {
       auditLog(request, undefined, 'api-access-denied-no-token');
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    
     const user = await validateTokenForMiddleware(token);
     if (!user) {
       auditLog(request, undefined, 'api-access-denied-invalid-token');
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
     // Add user info to request headers for API routes
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-id', user.userId);
     requestHeaders.set('x-user-email', user.email);
-    
     auditLog(request, user.userId, 'api-access-granted');
-    
     return NextResponse.next({
       request: {
         headers: requestHeaders,
@@ -101,7 +95,6 @@ export async function proxy(request: NextRequest) {
         console.warn('Invalid token provided in URL parameter');
         return NextResponse.redirect(new URL('/?error=invalid_token', request.url));
       }
-      
       // Token is valid, set cookie and proceed
       const response = NextResponse.next();
       response.cookies.set('token', urlToken, {
@@ -128,7 +121,6 @@ export async function proxy(request: NextRequest) {
         response.cookies.delete('token');
         return response;
       }
-      
       // Token is valid, refresh cookie expiry and proceed
       const response = NextResponse.next();
       response.cookies.set('token', token, {
