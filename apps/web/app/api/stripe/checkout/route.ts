@@ -16,10 +16,11 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
     const { priceId } = checkoutSchema.parse(data);
-    
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      allow_promotion_codes: true,
       line_items: [
         {
           price: priceId,
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
     console.error('Stripe checkout error:', error);
     return NextResponse.json(
-      { error: 'Failed to create checkout session' }, 
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     );
   }
