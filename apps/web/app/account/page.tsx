@@ -84,7 +84,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="bg-ps-primary h-[calc(100vh-4rem)] overflow-y-scroll">
+    <div className="bg-ps-primary h-[calc(100vh-6rem)] overflow-y-scroll">
       <div className="container mx-auto px-2 py-2 md:px-6 md:py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
