@@ -11,57 +11,57 @@ generator client {
 }
 
 model User {
-  id               String         @id @default(uuid())
-  email            String         @unique
-  firstName        String?
-  lastName         String?
-  phone            String?
-  
+  id        String  @id @default(uuid())
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  phone     String?
+
   // Billing Address (for tax calculation only)
-  addressLine1     String?
-  addressLine2     String?
-  addressCity      String?
-  addressState     String?
+  addressLine1      String?
+  addressLine2      String?
+  addressCity       String?
+  addressState      String?
   addressPostalCode String?
-  addressCountry   String?        @default("US")
-  
+  addressCountry    String? @default("US")
+
   // Stripe Integration - ONLY references, never payment data
-  stripeCustomerId String?        @unique
-  
-  frequency        String         // e.g., 'daily', 'weekly'
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  
-  prompts          Prompt[]
-  entries          Entry[]
-  subscriptions    Subscription[]
-  refreshTokens    RefreshToken[]
+  stripeCustomerId String? @unique
+
+  frequency String // e.g., 'daily', 'weekly'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prompts       Prompt[]
+  entries       Entry[]
+  subscriptions Subscription[]
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
 
 model Subscription {
-  id                   String             @id @default(uuid())
-  userId               String
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Stripe references - never store actual payment data
   stripeSubscriptionId String             @unique
   status               SubscriptionStatus
   planType             PlanType
-  
+
   // Subscription timing
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean            @default(false)
-  canceledAt           DateTime?
-  
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+
   // Pricing reference (Stripe Price ID)
-  stripePriceId        String
-  
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  
+  stripePriceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([stripeSubscriptionId])
   @@map("subscriptions")
@@ -72,7 +72,6 @@ model Prompt {
   content   String
   createdAt DateTime  @default(now())
   sentAt    DateTime?
-  frequency String    // e.g., 'daily', 'weekly'
   userId    String
   user      User      @relation(fields: [userId], references: [id])
   entries   Entry[]
@@ -102,10 +101,10 @@ model RefreshToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  @@map("refresh_tokens")
   @@index([userId])
   @@index([token])
   @@index([expiresAt])
+  @@map("refresh_tokens")
 }
 
 // Enums for subscription management
