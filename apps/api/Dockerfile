@@ -39,8 +39,8 @@ RUN npm run build
 FROM base
 
 # Add non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
+RUN addgroup --gid 1001 nodejs
+RUN adduser --uid 1001 --gid 1001 --disabled-password --gecos "" nestjs
 
 # Install runtime dependencies
 RUN apt-get update -qq && \
