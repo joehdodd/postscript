@@ -29,7 +29,7 @@ export default async function PromptDetail({ params }: PromptPageProps) {
 
   return (
     <div className="min-h-screen bg-ps-primary">
-      <div className="container mx-auto px-2 py-4 md:px-6 md:py-8">
+      <div className="container mx-auto p-4 md:px-6 md:py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-ps-secondary rounded-lg border-ps p-4 md:p-8 mb-6 border shadow-md">
             <PromptHeader prompt={prompt} />

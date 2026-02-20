@@ -17,7 +17,7 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
 
   return (
     <nav className="border-ps" style={{ borderBottomWidth: '1px' }}>
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto p-4 md:px-6 md:py-4">
         <div className="flex gap-4 flex-col md:items-center">
           {/* Logo */}
           <Link
