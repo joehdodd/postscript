@@ -15,7 +15,8 @@
     "PORT",
     "WEB_APP_URL",
     "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET"
+    "STRIPE_WEBHOOK_SECRET",
+    "API_KEY_SECRET"
   ],
   "tasks": {
     "dev": {

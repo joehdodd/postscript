@@ -7,11 +7,11 @@ class ApiKeyGuard {
     const request = context.switchToHttp().getRequest();
     const apiKey = request.headers['authorization']?.replace('Bearer ', '');
     const expectedKey = process.env.API_KEY_SECRET;
-    
+
     if (!expectedKey) {
       throw new Error('API_KEY_SECRET not configured');
     }
-    
+
     return apiKey === expectedKey;
   }
 }
@@ -19,15 +19,14 @@ class ApiKeyGuard {
 @UseGuards(ApiKeyGuard)
 @Controller('email')
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService) { }
 
   @Post('send-prompt')
   @HttpCode(HttpStatus.OK)
   async sendPrompt(
     @Body() body: { email: string; prompt?: string; userId?: string },
-    @Headers('authorization') auth: string,
   ) {
-    const { email, prompt, userId } = body;
+    const { email, prompt } = body;
 
     // Validate required fields
     if (!email) {
@@ -40,9 +39,14 @@ export class EmailController {
       throw new UnauthorizedException('Valid email is required');
     }
 
+    const user = await this.emailService['prisma'].user.findUnique({ where: { email } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    };
+
     try {
       const promptContent = prompt || this.getDefaultPrompt();
-      
+
       const result = await this.emailService.sendPrompt(email, promptContent);
 
       return {
@@ -72,7 +76,7 @@ export class EmailController {
       'What are you looking forward to tomorrow?',
       'What was the most meaningful part of your day?',
     ];
-    
+
     return prompts[Math.floor(Math.random() * prompts.length)];
   }
 }
