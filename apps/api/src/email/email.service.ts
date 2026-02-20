@@ -28,7 +28,7 @@ export class EmailService {
       const prompt = await prisma.prompt.create({
         data: {
           content: promptContent,
-          frequency: user.frequency,
+          frequency: 'weekly',
           userId: user.id,
           sentAt: new Date(),
           isOpen: true,

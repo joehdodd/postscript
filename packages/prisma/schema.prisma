@@ -72,6 +72,7 @@ model Prompt {
   content   String
   createdAt DateTime  @default(now())
   sentAt    DateTime?
+  frequency String // e.g., 'daily', 'weekly'
   userId    String
   user      User      @relation(fields: [userId], references: [id])
   entries   Entry[]
