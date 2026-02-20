@@ -3,14 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function Navigation() {
+export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?: boolean }) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: '/', label: 'Dashboard' },
     { href: '/prompt', label: 'Your Prompts' },
     { href: '/account', label: 'Account' },
   ];
+
+  if (hasDashboardAccess) {
+    navItems.unshift({ href: '/dashboard', label: 'Dashboard' });
+  }
 
   return (
     <nav className="border-ps" style={{ borderBottomWidth: '1px' }}>
@@ -32,11 +35,10 @@ export default function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                       ? 'text-ps-primary bg-ps-primary/10 dark:bg-ps-primary/20'
                       : 'text-ps-secondary hover:text-ps-primary hover:bg-ps-primary/5 dark:hover:bg-ps-primary/10'
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </Link>
