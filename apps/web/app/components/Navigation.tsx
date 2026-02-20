@@ -18,24 +18,24 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
   return (
     <nav className="border-ps" style={{ borderBottomWidth: '1px' }}>
       <div className="container mx-auto px-6 py-4">
-        <div className="flex flex-col md:items-center justify-between">
+        <div className="flex gap-4 flex-col md:items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
-            className="text-md md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
+            className="text-lg md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
-            _postscript
+            Postscript
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex md:items-center md:gap-6">
+          <div className="flex gap-2 justify-between md:items-center md:gap-6">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
+                  className={`font-medium transition-colors ${isActive
                     ? 'text-ps-primary bg-ps-primary/10 dark:bg-ps-primary/20'
                     : 'text-ps-secondary hover:text-ps-primary hover:bg-ps-primary/5 dark:hover:bg-ps-primary/10'
                     }`}
