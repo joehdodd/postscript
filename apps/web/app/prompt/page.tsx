@@ -20,11 +20,11 @@ export default async function Prompt() {
 
   return (
     <div className="min-h-screen bg-ps-primary">
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-2 py-2 md:px-6 md:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-ps-primary mb-2">
+            <h1 className="md:text-3xl font-bold text-ps-primary mb-2">
               Your Prompts
             </h1>
             <p className="text-ps-secondary">
@@ -45,7 +45,7 @@ export default async function Prompt() {
                     }}
                   >
                     <div className="mb-3">
-                      <p className="text-lg text-ps-primary leading-relaxed line-clamp-3">
+                      <p className="md:text-lg text-ps-primary leading-relaxed line-clamp-3">
                         &ldquo;{prompt.content}&rdquo;
                       </p>
                     </div>

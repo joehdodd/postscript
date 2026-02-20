@@ -5,6 +5,10 @@ import ConditionalNavigation from './components/ConditionalNavigation';
 export const metadata: Metadata = {
   title: '_postscript',
   description: 'Your personal journaling app',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+  },
 };
 
 export default function RootLayout({

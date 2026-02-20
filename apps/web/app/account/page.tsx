@@ -19,7 +19,7 @@ import { Subscription } from '../../types/subscription';
 export default function AccountPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userData, setUserData] = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
@@ -85,10 +85,10 @@ export default function AccountPage() {
 
   return (
     <div className="bg-ps-primary h-[calc(100vh-4rem)] overflow-y-scroll">
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-2 py-2 md:px-6 md:py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-ps-primary mb-2">
+            <h1 className="md:text-4xl font-bold text-ps-primary mb-2">
               Account & Billing
             </h1>
             <p className="text-ps-text-secondary">

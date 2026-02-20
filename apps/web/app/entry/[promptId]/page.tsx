@@ -25,7 +25,7 @@ export default async function Entry({ params }: EntryPageProps) {
 
   if (!prompt) {
     return (
-      <Card className="w-full">
+      <div className="card w-full max-w-lg mx-auto p-4 sm:p-6 md:p-8 lg:p-10">
         <h2 className="text-xl text-slate-600 font-bold mb-4">
           No Prompt Available
         </h2>

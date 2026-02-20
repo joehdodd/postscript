@@ -222,7 +222,7 @@ export default function AccountInformation({ userData, onUpdate }: AccountInform
   return (
     <div className="bg-ps-secondary rounded-lg p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-ps-primary">
+        <h2 className="md:text-xl font-semibold text-ps-primary">
           Account Information
         </h2>
         {!isEditing ? (
