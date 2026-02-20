@@ -19,8 +19,8 @@ export default function PromptHeader({ prompt }: PromptHeaderProps) {
   };
 
   return (
-    <div className="mb-8 pb-6 border-ps border-b">
-      <h1 className="text-3xl font-bold text-ps-primary mb-3">
+    <div className="py-2 mb-4 md:mb-8 pb-4 md:pb-6 border-ps border-b">
+      <h1 className="md:text-3xl font-bold text-ps-primary mb-3">
         Prompt Details
       </h1>
       <div className="flex flex-wrap items-center gap-4 text-sm text-ps-secondary">
@@ -59,9 +59,8 @@ export default function PromptHeader({ prompt }: PromptHeaderProps) {
           </span>
         )}
         <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${
-            prompt.isOpen ? 'text-white' : 'text-ps-secondary'
-          }`}
+          className={`px-3 py-1 rounded-full text-xs ${prompt.isOpen ? 'text-white' : 'text-ps-secondary'
+            }`}
           style={{
             backgroundColor: prompt.isOpen
               ? 'var(--ps-secondary-500)'

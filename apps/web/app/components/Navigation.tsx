@@ -22,7 +22,7 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
           {/* Logo */}
           <Link
             href="/"
-            className="text-sm md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
+            className="text-md md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
             _postscript
           </Link>

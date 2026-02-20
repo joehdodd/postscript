@@ -25,7 +25,7 @@ export default function PromptResponse({ promptId, isOpen, existingEntry }: Prom
   };
 
   return (
-    <div className="mb-8">
+    <div className="md:mb-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <svg
@@ -41,7 +41,7 @@ export default function PromptResponse({ promptId, isOpen, existingEntry }: Prom
               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
             />
           </svg>
-          <h2 className="text-xl font-semibold text-ps-primary">
+          <h2 className="md:text-xl font-semibold text-ps-primary">
             Your Response
           </h2>
         </div>
@@ -58,7 +58,7 @@ export default function PromptResponse({ promptId, isOpen, existingEntry }: Prom
           </Link>
         )}
       </div>
-      
+
       {existingEntry ? (
         <div
           className="bg-ps-primary p-6 rounded-lg border-ps"
@@ -83,7 +83,7 @@ export default function PromptResponse({ promptId, isOpen, existingEntry }: Prom
             Written on {formatDate(existingEntry.createdAt)}
           </div>
           <div className="prose prose-lg max-w-none">
-            <p className="whitespace-pre-wrap text-ps-primary leading-relaxed text-lg">
+            <p className="whitespace-pre-wrap text-ps-primary leading-relaxed md:text-lg">
               {existingEntry.content}
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function PromptResponse({ promptId, isOpen, existingEntry }: Prom
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-ps-primary mb-2">
+          <h3 className="md:text-lg font-semibold text-ps-primary mb-2">
             No response yet
           </h3>
           {isOpen ? (

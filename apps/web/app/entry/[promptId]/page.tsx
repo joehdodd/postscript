@@ -25,7 +25,7 @@ export default async function Entry({ params }: EntryPageProps) {
 
   if (!prompt) {
     return (
-      <div className="card w-full max-w-lg mx-auto p-4 sm:p-6 md:p-8 lg:p-10">
+      <Card className="h-[600px] w-full">
         <h2 className="text-xl text-slate-600 font-bold mb-4">
           No Prompt Available
         </h2>
@@ -46,7 +46,7 @@ export default async function Entry({ params }: EntryPageProps) {
   const existingEntry = await fetchEntryByPromptAndUser(prompt.id, userId);
 
   return (
-    <Card className="w-full">
+    <Card className="h-[600px] w-full">
       <h2 className="text-xl text-ps-primary font-bold mb-4">
         {prompt.isOpen ? 'New Entry' : 'Your Entry'}
       </h2>

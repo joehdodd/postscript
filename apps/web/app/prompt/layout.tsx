@@ -5,9 +5,9 @@ export default function PromptLayout({
 }) {
   return (
     <div className="bg-ps-primary h-[calc(100vh-64px)] overflow-y-scroll">
-        <div className="w-full flex justify-center p-4">
-          {children}
-        </div>
+      <div className="w-full flex justify-center md:p-4">
+        {children}
+      </div>
     </div>
   );
 }
