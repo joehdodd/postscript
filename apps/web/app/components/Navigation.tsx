@@ -28,7 +28,7 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex gap-2 justify-between md:items-center md:gap-6">
+          <div className="flex gap-2 justify-start md:items-center md:gap-6">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
