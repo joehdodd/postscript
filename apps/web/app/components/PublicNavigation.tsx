@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '../../public/postscript.png';
 
 export default function PublicNavigation() {
   return (
@@ -9,9 +11,17 @@ export default function PublicNavigation() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
+            className="text-lg md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
-            _postscript
+            <div className="flex items-center gap-2">
+              <Image
+                src={logo}
+                alt="Postscript Logo"
+                width={40}
+                height={40}
+              />
+              <span>Postscript</span>
+            </div>
           </Link>
           <div className="flex items-center gap-6">
             <Link

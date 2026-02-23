@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import ConditionalNavigation from './components/ConditionalNavigation';
 
 export const metadata: Metadata = {
-  title: '_postscript',
+  title: 'Postscript',
   description: 'Your personal journaling app',
   viewport: {
     width: 'device-width',

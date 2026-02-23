@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import logo from '../../public/postscript.png';
 
 export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?: boolean }) {
   const pathname = usePathname();
@@ -18,12 +20,20 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
   return (
     <nav className="border-ps" style={{ borderBottomWidth: '1px' }}>
       <div className="container mx-auto p-4 md:px-6 md:py-4">
-        <div className="flex gap-4 flex-col md:items-center">
+        <div className="flexs gap-4 items-center">
           <Link
             href="/"
             className="text-lg md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
-            Postscript
+            <div className="flex items-center gap-2">
+              <Image
+                src={logo}
+                alt="Postscript Logo"
+                width={40}
+                height={40}
+              />
+              <span>Postscript</span>
+            </div>
           </Link>
           <div className="flex gap-2 justify-start md:items-center md:gap-6">
             {navItems.map((item) => {
