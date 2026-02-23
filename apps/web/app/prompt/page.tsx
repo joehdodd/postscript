@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { requireAuth } from '../actions/auth';
 import { fetchUserPrompts } from '../actions/prompt';
 import GenerateNewPrompt from '../components/GenerateNewPrompt';
+import { fetchUserSubscription } from '../actions/account';
 
 type Prompt = {
   id: string;
@@ -17,6 +18,8 @@ export default async function Prompt() {
     redirect('/');
   }
   const prompts = await fetchUserPrompts(userId);
+  const subscription = await fetchUserSubscription();
+  const hasGeneratePromptAccess = subscription?.planType === 'PLATINUM';
 
   return (
     <div className="min-h-screen bg-ps-primary">
@@ -31,7 +34,9 @@ export default async function Prompt() {
               You may still respond to any open prompts. Click on any prompt to
               view details or write your entry.
             </p>
-            <GenerateNewPrompt />
+            {hasGeneratePromptAccess && (
+              <GenerateNewPrompt />
+            )}
           </div>
           <div className="flex flex-col gap-2 space-y-4">
             {prompts?.length > 0 ? (
