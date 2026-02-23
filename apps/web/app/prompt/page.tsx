@@ -19,7 +19,7 @@ export default async function Prompt() {
   }
   const prompts = await fetchUserPrompts(userId);
   const subscription = await fetchUserSubscription();
-  const hasGeneratePromptAccess = subscription?.planType === 'PLATINUM';
+  const hasGeneratePromptAccess = subscription?.planType === 'PLATINUM' || subscription?.planType === 'GOLD';
 
   return (
     <div className="min-h-screen bg-ps-primary">
