@@ -11,9 +11,9 @@ export class SchedulerService {
 
   /**
    * Send daily prompts to all users with 'daily' frequency
-   * Runs every day at 9:00 AM
+   * Runs every day at noon (12:00 PM) 
    */
-  @Cron(CronExpression.EVERY_DAY_AT_9AM)
+  @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async sendDailyPrompts() {
     this.logger.log('Starting daily prompt job...');
 
