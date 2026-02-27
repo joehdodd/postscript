@@ -25,15 +25,7 @@ export default function Navigation({ hasDashboardAccess }: { hasDashboardAccess?
             href="/"
             className="text-lg md:text-2xl font-bold text-ps-primary hover:opacity-80 transition-opacity"
           >
-            <div className="flex items-center gap-2">
-              <Image
-                src={logo}
-                alt="Postscript Logo"
-                width={40}
-                height={40}
-              />
-              <span>Postscript</span>
-            </div>
+            <span>🗒️ Postscript</span>
           </Link>
           <div className="flex gap-2 justify-start md:items-center md:gap-6">
             {navItems.map((item) => {
